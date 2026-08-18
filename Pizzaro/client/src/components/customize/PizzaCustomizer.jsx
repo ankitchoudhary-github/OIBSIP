@@ -29,26 +29,31 @@ const bases = [
     name: "Classic",
     description: "Our signature hand-stretched base",
     price: 299,
+    image: "/images/customizer/bases/classic-crust.png",
   },
   {
     name: "Thin Crust",
     description: "Light, crispy & perfectly golden",
     price: 329,
+    image: "/images/customizer/bases/thin-crust.png",
   },
   {
     name: "Whole Wheat",
     description: "Wholesome & hearty",
     price: 339,
+    image: "/images/customizer/bases/whole-wheat.png",
   },
   {
     name: "Cheese Burst",
     description: "Loaded with creamy cheese",
     price: 369,
+    image: "/images/customizer/bases/cheese-burst.png",
   },
   {
     name: "Stuffed Crust",
     description: "Golden crust packed with cheese",
     price: 389,
+    image: "/images/customizer/bases/stuffed-crust.png",
   },
 ];
 
@@ -57,26 +62,31 @@ const sauces = [
     name: "Classic Tomato",
     description: "Rich Italian tomato sauce",
     price: 0,
+    image: "/images/customizer/sauces/classic-tomato.png",
   },
   {
     name: "BBQ",
     description: "Smoky, sweet & tangy",
     price: 20,
+    image: "/images/customizer/sauces/BBQ.png",
   },
   {
     name: "Spicy Arrabbiata",
     description: "Tomato sauce with a kick",
     price: 25,
+    image: "/images/customizer/sauces/spicy-arrabbiata_sauce.png",
   },
   {
     name: "Creamy Garlic",
     description: "Smooth garlic cream sauce",
     price: 30,
+    image: "/images/customizer/sauces/creamy-garlic.png",
   },
   {
     name: "Pesto",
     description: "Fresh basil & parmesan",
     price: 35,
+    image: "/images/customizer/sauces/pesto.png",
   },
 ];
 
@@ -85,21 +95,25 @@ const cheeses = [
     name: "Mozzarella",
     description: "Classic stretchy mozzarella",
     price: 0,
+    image: "/images/customizer/cheeses/mozzarella.png",
   },
   {
     name: "Cheddar",
     description: "Sharp & rich",
     price: 30,
+    image: "/images/customizer/cheeses/cheddar.png",
   },
   {
     name: "Parmesan",
     description: "Nutty & aged",
     price: 40,
+    image: "/images/customizer/cheeses/parmesan.png",
   },
   {
     name: "Four Cheese",
     description: "A decadent cheese blend",
     price: 60,
+    image: "/images/customizer/cheeses/four-cheese.png",
   },
 ];
 
@@ -107,34 +121,42 @@ const vegetables = [
   {
     name: "Onions",
     price: 20,
+    image: "/images/customizer/toppings/onions.png",
   },
   {
     name: "Capsicum",
     price: 20,
+    image: "/images/customizer/toppings/capsicum.png",
   },
   {
     name: "Mushrooms",
     price: 30,
+    image: "/images/customizer/toppings/mushrooms.png",
   },
   {
     name: "Black Olives",
     price: 30,
+    image: "/images/customizer/toppings/black-olives.png",
   },
   {
     name: "Jalapeños",
     price: 30,
+    image: "/images/customizer/toppings/jalapenos.png",
   },
   {
     name: "Sweet Corn",
     price: 25,
+    image: "/images/customizer/toppings/sweet-corn.png",
   },
   {
     name: "Tomatoes",
     price: 20,
+    image: "/images/customizer/toppings/tomatoes.png",
   },
   {
     name: "Spinach",
     price: 25,
+    image: "/images/customizer/toppings/spinach.png",
   },
 ];
 
@@ -239,21 +261,19 @@ const PizzaCustomizer = () => {
                     className="flex flex-col items-center gap-3"
                   >
                     <span
-                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-300 ${
-                        active || completed
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-300 ${active || completed
                           ? "border-pizzaro-red bg-pizzaro-red text-white shadow-lg"
                           : "border-black/10 bg-pizzaro-cream text-pizzaro-muted"
-                      }`}
+                        }`}
                     >
                       {completed ? <Check size={17} /> : step.number}
                     </span>
 
                     <span
-                      className={`hidden text-sm font-semibold sm:block ${
-                        active
+                      className={`hidden text-sm font-semibold sm:block ${active
                           ? "text-pizzaro-red"
                           : "text-pizzaro-muted"
-                      }`}
+                        }`}
                     >
                       {step.title}
                     </span>
@@ -343,11 +363,10 @@ const PizzaCustomizer = () => {
                         key={base.name}
                         type="button"
                         onClick={() => setSelectedBase(base.name)}
-                        className={`group rounded-2xl border p-5 text-left transition-all duration-300 ${
-                          selected
+                        className={`group rounded-2xl border p-5 text-left transition-all duration-300 ${selected
                             ? "border-pizzaro-red bg-pizzaro-red/5 shadow-md"
                             : "border-black/10 hover:-translate-y-0.5 hover:border-pizzaro-red/40 hover:shadow-sm"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
@@ -361,11 +380,10 @@ const PizzaCustomizer = () => {
                           </div>
 
                           <span
-                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-                              selected
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${selected
                                 ? "border-pizzaro-red bg-pizzaro-red text-white"
                                 : "border-black/10"
-                            }`}
+                              }`}
                           >
                             {selected && <Check size={13} />}
                           </span>
@@ -407,11 +425,10 @@ const PizzaCustomizer = () => {
                         key={sauce.name}
                         type="button"
                         onClick={() => setSelectedSauce(sauce.name)}
-                        className={`flex w-full items-center justify-between rounded-2xl border p-5 text-left transition-all duration-300 ${
-                          selected
+                        className={`flex w-full items-center justify-between rounded-2xl border p-5 text-left transition-all duration-300 ${selected
                             ? "border-pizzaro-red bg-pizzaro-red/5"
                             : "border-black/10 hover:border-pizzaro-red/40"
-                        }`}
+                          }`}
                       >
                         <div>
                           <h4 className="font-semibold text-pizzaro-dark">
@@ -431,11 +448,10 @@ const PizzaCustomizer = () => {
                           </span>
 
                           <span
-                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                              selected
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${selected
                                 ? "border-pizzaro-red bg-pizzaro-red text-white"
                                 : "border-black/10"
-                            }`}
+                              }`}
                           >
                             {selected && <Check size={13} />}
                           </span>
@@ -473,11 +489,10 @@ const PizzaCustomizer = () => {
                         key={cheese.name}
                         type="button"
                         onClick={() => setSelectedCheese(cheese.name)}
-                        className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
-                          selected
+                        className={`rounded-2xl border p-5 text-left transition-all duration-300 ${selected
                             ? "border-pizzaro-red bg-pizzaro-red/5 shadow-md"
                             : "border-black/10 hover:-translate-y-0.5 hover:border-pizzaro-red/40"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start justify-between">
                           <div>
@@ -491,11 +506,10 @@ const PizzaCustomizer = () => {
                           </div>
 
                           <span
-                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                              selected
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${selected
                                 ? "border-pizzaro-red bg-pizzaro-red text-white"
                                 : "border-black/10"
-                            }`}
+                              }`}
                           >
                             {selected && <Check size={13} />}
                           </span>
@@ -543,11 +557,10 @@ const PizzaCustomizer = () => {
                         onClick={() =>
                           toggleVegetable(vegetable.name)
                         }
-                        className={`flex items-center justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${
-                          selected
+                        className={`flex items-center justify-between rounded-2xl border p-4 text-left transition-all duration-300 ${selected
                             ? "border-pizzaro-red bg-pizzaro-red/5"
                             : "border-black/10 hover:border-pizzaro-red/40"
-                        }`}
+                          }`}
                       >
                         <div>
                           <h4 className="font-semibold text-pizzaro-dark">
@@ -560,11 +573,10 @@ const PizzaCustomizer = () => {
                         </div>
 
                         <span
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                            selected
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border ${selected
                               ? "border-pizzaro-red bg-pizzaro-red text-white"
                               : "border-black/10"
-                          }`}
+                            }`}
                         >
                           {selected && <Check size={13} />}
                         </span>
