@@ -3,19 +3,19 @@ const pizzas = [
     name: "BBQ Poncho",
     description: "Smoky BBQ sauce, tender chicken & melted cheese.",
     price: "₹399",
-    image: "/images/bbq poncho.png",
+    image: "/images/menu/bbq poncho.png",
   },
   {
     name: "Bombay",
     description: "A bold Indian-inspired pizza packed with flavour.",
     price: "₹349",
-    image: "/images/bombay.png",
+    image: "/images/menu/bombay.png",
   },
   {
     name: "Cheeseburger Pizza",
     description: "All the comfort of a cheeseburger on a pizza.",
     price: "₹449",
-    image: "/images/cheeseburger pizza.png",
+    image: "/images/menu/cheeseburger pizza.png",
   },
 ];
 
