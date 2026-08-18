@@ -1,0 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --color-pizzaro-red: #e63946;
+  --color-pizzaro-red-dark: #c92f3b;
+  --color-pizzaro-orange: #f4a261;
+  --color-pizzaro-cream: #fff8f0;
+  --color-pizzaro-dark: #17110f;
+  --color-pizzaro-brown: #3a2924;
+  --color-pizzaro-muted: #8c7b75;
+  --color-pizzaro-green: #2a9d8f;
+
+  --font-display: "DM Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --shadow-pizzaro: 0 20px 60px rgba(23, 17, 15, 0.12);
+  --shadow-pizzaro-lg: 0 30px 80px rgba(23, 17, 15, 0.18);
+
+  --radius-pizzaro: 1.25rem;
+}
+
+:root {
+  font-family: var(--font-body);
+  color: var(--color-pizzaro-dark);
+  background: var(--color-pizzaro-cream);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
