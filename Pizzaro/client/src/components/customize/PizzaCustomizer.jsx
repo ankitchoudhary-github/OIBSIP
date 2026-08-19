@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { useCart } from "../../context/CartContext";
 
 const steps = [
   {
@@ -141,7 +142,7 @@ const vegetables = [
   {
     name: "Jalapeños",
     price: 30,
-    image: "/images/customizer/toppings/jalapeneos.png",
+    image: "/images/customizer/toppings/jalapenos.png",
   },
   {
     name: "Sweet Corn",
@@ -168,6 +169,8 @@ const PizzaCustomizer = () => {
   const [selectedCheese, setSelectedCheese] = useState("Mozzarella");
   const [selectedVegetables, setSelectedVegetables] = useState([]);
 
+  const { addToCart } = useCart();
+
   const toggleVegetable = (vegetable) => {
     setSelectedVegetables((current) =>
       current.includes(vegetable)
@@ -186,11 +189,16 @@ const PizzaCustomizer = () => {
     const cheese =
       cheeses.find((item) => item.name === selectedCheese)?.price ?? 0;
 
-    const vegetablesPrice = selectedVegetables.reduce((total, vegetable) => {
-      const item = vegetables.find((entry) => entry.name === vegetable);
+    const vegetablesPrice = selectedVegetables.reduce(
+      (total, vegetable) => {
+        const item = vegetables.find(
+          (entry) => entry.name === vegetable
+        );
 
-      return total + (item?.price ?? 0);
-    }, 0);
+        return total + (item?.price ?? 0);
+      },
+      0
+    );
 
     return base + sauce + cheese + vegetablesPrice;
   }, [
@@ -199,6 +207,40 @@ const PizzaCustomizer = () => {
     selectedCheese,
     selectedVegetables,
   ]);
+
+  const createCustomPizzaId = () => {
+    return [
+      "custom",
+      selectedBase,
+      selectedSauce,
+      selectedCheese,
+      ...[...selectedVegetables].sort(),
+    ]
+      .join("|")
+      .toLowerCase();
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: createCustomPizzaId(),
+      type: "custom",
+      name: `${selectedBase} Pizza`,
+      image: "/images/menu/customizer-pizza.png",
+
+      base: selectedBase,
+      sauce: selectedSauce, 
+      cheese: selectedCheese,
+      vegetables: [...selectedVegetables],
+      price: totalPrice,
+      quantity: 1,
+    });
+    // Reset builder for the next pizza
+    setSelectedBase("Classic");
+    setSelectedSauce("Classic Tomato");
+    setSelectedCheese("Mozzarella");
+    setSelectedVegetables([]);
+    setCurrentStep(0);
+  };
 
   const canGoNext = currentStep < steps.length - 1;
   const canGoBack = currentStep > 0;
@@ -435,8 +477,8 @@ const PizzaCustomizer = () => {
                         type="button"
                         onClick={() => setSelectedSauce(sauce.name)}
                         className={`group flex w-full items-center gap-5 rounded-2xl border p-4 text-left transition-all duration-300 ${selected
-                            ? "border-pizzaro-red bg-pizzaro-red/5"
-                            : "border-black/10 hover:border-pizzaro-red/40"
+                          ? "border-pizzaro-red bg-pizzaro-red/5"
+                          : "border-black/10 hover:border-pizzaro-red/40"
                           }`}
                       >
                         {/* Sauce image */}
@@ -467,8 +509,8 @@ const PizzaCustomizer = () => {
 
                           <span
                             className={`flex h-6 w-6 items-center justify-center rounded-full border ${selected
-                                ? "border-pizzaro-red bg-pizzaro-red text-white"
-                                : "border-black/10"
+                              ? "border-pizzaro-red bg-pizzaro-red text-white"
+                              : "border-black/10"
                               }`}
                           >
                             {selected && <Check size={13} />}
@@ -508,8 +550,8 @@ const PizzaCustomizer = () => {
                         type="button"
                         onClick={() => setSelectedCheese(cheese.name)}
                         className={`group rounded-2xl border p-4 text-left transition-all duration-300 ${selected
-                            ? "border-pizzaro-red bg-pizzaro-red/5 shadow-md"
-                            : "border-black/10 hover:-translate-y-0.5 hover:border-pizzaro-red/40"
+                          ? "border-pizzaro-red bg-pizzaro-red/5 shadow-md"
+                          : "border-black/10 hover:-translate-y-0.5 hover:border-pizzaro-red/40"
                           }`}
                       >
                         {/* Cheese image */}
@@ -534,8 +576,8 @@ const PizzaCustomizer = () => {
 
                           <span
                             className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${selected
-                                ? "border-pizzaro-red bg-pizzaro-red text-white"
-                                : "border-black/10"
+                              ? "border-pizzaro-red bg-pizzaro-red text-white"
+                              : "border-black/10"
                               }`}
                           >
                             {selected && <Check size={13} />}
@@ -574,7 +616,7 @@ const PizzaCustomizer = () => {
                 <div className="grid grid-cols-2 gap-3">
                   {vegetables.map((vegetable) => {
                     const selected = selectedVegetables.includes(
-                      vegetable.name,
+                      vegetable.name
                     );
 
                     return (
@@ -583,11 +625,10 @@ const PizzaCustomizer = () => {
                         type="button"
                         onClick={() => toggleVegetable(vegetable.name)}
                         className={`group flex items-center gap-4 rounded-2xl border p-3 text-left transition-all duration-300 ${selected
-                            ? "border-pizzaro-red bg-pizzaro-red/5 shadow-sm"
-                            : "border-black/10 hover:border-pizzaro-red/40"
+                          ? "border-pizzaro-red bg-pizzaro-red/5 shadow-sm"
+                          : "border-black/10 hover:border-pizzaro-red/40"
                           }`}
                       >
-                        {/* Vegetable image */}
                         <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f5e8dc]">
                           <img
                             src={vegetable.image}
@@ -608,8 +649,8 @@ const PizzaCustomizer = () => {
 
                         <span
                           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${selected
-                              ? "border-pizzaro-red bg-pizzaro-red text-white"
-                              : "border-black/10"
+                            ? "border-pizzaro-red bg-pizzaro-red text-white"
+                            : "border-black/10"
                             }`}
                         >
                           {selected && <Check size={13} />}
@@ -645,10 +686,12 @@ const PizzaCustomizer = () => {
               ) : (
                 <button
                   type="button"
+                  onClick={handleAddToCart}
                   className="flex items-center gap-2 rounded-full bg-pizzaro-dark px-6 py-3 text-sm font-semibold text-white transition hover:bg-pizzaro-red"
                 >
                   Add to Cart
                   <ChevronRight size={18} />
+
                 </button>
               )}
             </div>
