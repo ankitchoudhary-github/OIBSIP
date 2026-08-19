@@ -1,30 +1,28 @@
 import { createContext, useContext, useMemo, useState } from "react";
 
 const CartContext = createContext(null);
-
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [lastAddedItem, setLastAddedItem] = useState(null);
 
   const addToCart = (item) => {
     setCartItems((currentItems) => {
       const existingItem = currentItems.find(
-        (cartItem) => cartItem.id === item.id
+        (cartItem) => cartItem.id === item.id,
       );
 
-      // Same product/configuration → increase quantity
       if (existingItem) {
         return currentItems.map((cartItem) =>
           cartItem.id === item.id
             ? {
-                ...cartItem,
-                quantity:
-                  cartItem.quantity + (item.quantity ?? 1),
-              }
-            : cartItem
+              ...cartItem,
+              quantity:
+                cartItem.quantity + (item.quantity ?? 1),
+            }
+            : cartItem,
         );
       }
 
-      // New product/configuration
       return [
         ...currentItems,
         {
@@ -33,6 +31,12 @@ export function CartProvider({ children }) {
         },
       ];
     });
+
+    setLastAddedItem(item);
+  };
+
+  const clearLastAddedItem = () => {
+    setLastAddedItem(null);
   };
 
   const removeFromCart = (id) => {
@@ -77,16 +81,18 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        subtotal,
-      }}
-    >
+  value={{
+    cartItems,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    totalItems,
+    subtotal,
+    lastAddedItem,
+    clearLastAddedItem,
+  }}
+>
       {children}
     </CartContext.Provider>
   );
