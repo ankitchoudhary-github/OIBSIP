@@ -70,9 +70,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 >
                   {totalItems === 0
                     ? "Nothing here yet"
-                    : `${totalItems} item${
-                        totalItems === 1 ? "" : "s"
-                      }`}
+                    : `${totalItems} item${totalItems === 1 ? "" : "s"
+                    }`}
                 </motion.p>
               </div>
 
@@ -341,9 +340,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         ₹{subtotal}
                       </motion.p>
                     </div>
-
                     <button
                       type="button"
+                      onClick={() => {
+                        onClose();
+                        window.location.hash = "checkout";
+                      }}
                       className="flex items-center gap-2 rounded-full bg-pizzaro-red px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-pizzaro-red/20 transition hover:bg-pizzaro-red-dark"
                     >
                       Checkout

@@ -1,12 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CartToast from "./components/ui/CartToast";
 import { useCart } from "./context/CartContext";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/landing/Hero";
 import FeaturedPizzas from "./components/landing/FeaturedPizzas";
 import PizzaCustomizer from "./components/customize/PizzaCustomizer";
+import Checkout from "./pages/checkout/checkout";
 
 function App() {
+
+  const [isCheckout, setIsCheckout] = useState(
+  window.location.hash === "#checkout",
+);
+
+useEffect(() => {
+  const handleHashChange = () => {
+    setIsCheckout(window.location.hash === "#checkout");
+  };
+
+  window.addEventListener("hashchange", handleHashChange);
+
+  return () => {
+    window.removeEventListener("hashchange", handleHashChange);
+  };
+}, []);
+
   const { lastAddedItem, clearLastAddedItem } = useCart();
 
   useEffect(() => {
@@ -18,6 +36,20 @@ function App() {
 
     return () => clearTimeout(timer);
   }, [lastAddedItem, clearLastAddedItem]);
+
+  if (isCheckout) {
+  return (
+    <>
+      <Navbar />
+
+      <Checkout
+        onBack={() => {
+          window.location.hash = "customize";
+        }}
+      />
+    </>
+  );
+}
 
   return (
     <main className="min-h-screen bg-pizzaro-cream">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { ShoppingBag, Menu } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -84,19 +84,6 @@ function Navbar() {
               onClick={() => setIsCartOpen(true)}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
-              animate={
-                totalItems > 0
-                  ? {
-                      scale: [1, 1.08, 1],
-                    }
-                  : {
-                      scale: 1,
-                    }
-              }
-              transition={{
-                duration: 0.35,
-                ease: "easeOut",
-              }}
               className="relative flex h-10 w-10 items-center justify-center rounded-full bg-pizzaro-dark text-white"
               aria-label="Open shopping cart"
             >
@@ -106,25 +93,31 @@ function Navbar() {
               />
 
               {/* Cart count */}
-              <motion.span
-                key={totalItems}
-                initial={{
-                  scale: 0.4,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: [0.4, 1.25, 1],
-                  opacity: 1,
-                }}
-                transition={{
-                  duration: 0.35,
-                  times: [0, 0.55, 1],
-                  ease: "easeOut",
-                }}
-                className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-pizzaro-red px-1 text-[10px] font-bold text-white"
-              >
-                {totalItems}
-              </motion.span>
+              <AnimatePresence mode="popLayout">
+                <motion.span
+                  key={totalItems}
+                  initial={{
+                    scale: 0.6,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    scale: 1,
+                    opacity: 1,
+                  }}
+                  exit={{
+                    scale: 0.6,
+                    opacity: 0,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 22,
+                  }}
+                  className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-pizzaro-red px-1 text-[10px] font-bold text-white"
+                >
+                  {totalItems}
+                </motion.span>
+              </AnimatePresence>
             </motion.button>
 
             {/* Sign In */}
