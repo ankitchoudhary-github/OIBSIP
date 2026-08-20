@@ -132,74 +132,76 @@ const Hero = () => {
           </motion.div>
         </div>
 
-        {/* Pizza visual */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, x: 30 }}
-          animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{
-            duration: 0.8,
-            delay: 0.15,
-            ease: "easeOut",
-          }}
-          className="relative flex min-h-115 items-center justify-center lg:min-h-155"
-        >
-          {/* Decorative plate/glow */}
-          <div className="absolute h-85 w-85 rounded-full bg-white/70 shadow-[0_30px_80px_rgba(0,0,0,0.08)] sm:h-110 sm:w-110 lg:h-130 lg:w-130" />
+{/* Pizza visual */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9, x: 30 }}
+  animate={{ opacity: 1, scale: 1, x: 0 }}
+  transition={{
+    duration: 0.8,
+    delay: 0.15,
+    ease: "easeOut",
+  }}
+  className="relative flex min-h-115 items-center justify-center lg:min-h-155"
+>
+  {/* Pizza */}
+  <motion.img
+    src="/images/menu/hero-image.png"
+    alt="Freshly prepared Pizzaro pizza"
+    className="relative z-10 w-97.5 object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.18)] sm:w-125 lg:w-155"
+    animate={{
+      y: [0, -8, 0],
+      rotate: [-1, 1, -1],
+    }}
+    transition={{
+      duration: 7,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  />
 
-          <div className="absolute h-62.5 w-62.5 rounded-full border border-pizzaro-red/10 sm:h-85 sm:w-85 lg:h-105 lg:w-105" />
+  {/* Floating label */}
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{
+      delay: 0.8,
+      duration: 0.4,
+    }}
+    className="absolute right-0 top-[18%] z-20 rounded-2xl border border-black/5 bg-white/90 px-4 py-3 shadow-lg backdrop-blur sm:right-[4%]"
+  >
+    <p className="text-[10px] font-bold uppercase tracking-[2px] text-pizzaro-red">
+      Fan favourite
+    </p>
 
-          {/* Pizza */}
-          <motion.img
-            src="/images/menu/hero-image.png"
-            alt="Freshly prepared Pizzaro pizza"
-            className="relative z-10 w-75 object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.18)] sm:w-95 lg:w-117.5"
-            animate={{
-              y: [0, -8, 0],
-              rotate: [-1, 1, -1],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+    <p className="mt-1 font-display text-lg font-bold text-pizzaro-dark">
+      Bombay
+    </p>
+  </motion.div>
 
-          {/* Floating label */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.4 }}
-            className="absolute right-0 top-[18%] z-20 rounded-2xl border border-black/5 bg-white/90 px-4 py-3 shadow-lg backdrop-blur sm:right-[4%]"
-          >
-            <p className="text-[10px] font-bold uppercase tracking-[2px] text-pizzaro-red">
-              Fan favourite
-            </p>
+  {/* Floating customization badge */}
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{
+      delay: 1,
+      duration: 0.4,
+    }}
+    className="absolute bottom-[12%] left-0 z-20 rounded-2xl bg-pizzaro-dark px-5 py-4 text-white shadow-xl sm:left-[4%]"
+  >
+    <p className="text-xs text-white/60">
+      Make it yours
+    </p>
 
-            <p className="mt-1 font-display text-lg font-bold text-pizzaro-dark">
-              Bombay
-            </p>
-          </motion.div>
+    <p className="mt-1 font-display text-xl font-bold">
+      Choose your toppings
+    </p>
+  </motion.div>
 
-          {/* Floating customization badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1, duration: 0.4 }}
-            className="absolute bottom-[12%] left-0 z-20 rounded-2xl bg-pizzaro-dark px-5 py-4 text-white shadow-xl sm:left-[4%]"
-          >
-            <p className="text-xs text-white/60">
-              Make it yours
-            </p>
+  {/* Tiny decorative dots */}
+  <span className="absolute left-[14%] top-[18%] h-3 w-3 rounded-full bg-pizzaro-red" />
 
-            <p className="mt-1 font-display text-xl font-bold">
-              Choose your toppings
-            </p>
-          </motion.div>
-
-          {/* Tiny decorative dots */}
-          <span className="absolute left-[14%] top-[18%] h-3 w-3 rounded-full bg-pizzaro-red" />
-          <span className="absolute right-[18%] bottom-[22%] h-4 w-4 rounded-full bg-pizzaro-orange" />
-        </motion.div>
+  <span className="absolute right-[18%] bottom-[22%] h-4 w-4 rounded-full bg-pizzaro-orange" />
+</motion.div>
       </div>
 
       {/* Bottom transition */}

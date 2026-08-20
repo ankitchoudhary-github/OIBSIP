@@ -5,7 +5,8 @@ import Navbar from "./components/layout/Navbar";
 import Hero from "./components/landing/Hero";
 import FeaturedPizzas from "./components/landing/FeaturedPizzas";
 import PizzaCustomizer from "./components/customize/PizzaCustomizer";
-import Checkout from "./pages/checkout/checkout";
+import Checkout from "./pages/checkout/Checkout";
+import Footer from "./components/layout/Footer";
 
 function App() {
 
@@ -68,7 +69,9 @@ useEffect(() => {
       <FeaturedPizzas />
 
       <PizzaCustomizer />
+      <Footer />
     </main>
+    
   );
 }
 

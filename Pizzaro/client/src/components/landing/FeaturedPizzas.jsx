@@ -101,13 +101,6 @@ const FeaturedPizzas = () => {
               flavour.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="hidden rounded-full border border-gray-200 px-5 py-2.5 text-sm font-semibold text-pizzaro-dark transition hover:border-pizzaro-red hover:text-pizzaro-red md:block"
-          >
-            View Full Menu →
-          </button>
         </div>
 
         {/* Pizza cards */}
