@@ -35,6 +35,7 @@ const Hero = () => {
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-4">
         {/* Left content */}
         <div className="relative z-10 max-w-2xl">
+          
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,7 +85,7 @@ const Hero = () => {
               }}
               className="group flex items-center gap-2.5 rounded-full bg-pizzaro-red px-7 py-4 font-semibold text-white shadow-lg shadow-pizzaro-red/20 transition duration-300 hover:-translate-y-0.5 hover:bg-pizzaro-red-dark hover:shadow-xl"
             >
-              Start Ordering
+              Order Classics
 
               <ArrowRight
                 size={18}
@@ -140,16 +141,16 @@ const Hero = () => {
             delay: 0.15,
             ease: "easeOut",
           }}
-          className="relative flex min-h-115 translate-y-8 items-center justify-center lg:min-h-155 lg:translate-y-12"
+          className="relative flex min-h-115 items-center justify-center lg:min-h-155"
         >
           {/* Decorative plate/glow */}
-          <div className="absolute h-77 w-77 rounded-full bg-white/70 shadow-[0_30px_80px_rgba(0,0,0,0.08)] sm:h-97.5 sm:w-97.5 lg:h-112.5 lg:w-112.5" />
+          <div className="absolute h-85 w-85 rounded-full bg-white/70 shadow-[0_30px_80px_rgba(0,0,0,0.08)] sm:h-110 sm:w-110 lg:h-130 lg:w-130" />
 
-          <div className="absolute h-56.25 w-56.25 rounded-full border border-pizzaro-red/10 sm:h-75 sm:w-75 lg:h-91.25 lg:w-91.25" />
+          <div className="absolute h-62.5 w-62.5 rounded-full border border-pizzaro-red/10 sm:h-85 sm:w-85 lg:h-105 lg:w-105" />
 
           {/* Pizza */}
           <motion.img
-            src="/images/menu/customizer-pizza.png"
+            src="/images/menu/hero-image.png"
             alt="Freshly prepared Pizzaro pizza"
             className="relative z-10 w-75 object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.18)] sm:w-95 lg:w-117.5"
             animate={{
@@ -197,7 +198,6 @@ const Hero = () => {
 
           {/* Tiny decorative dots */}
           <span className="absolute left-[14%] top-[18%] h-3 w-3 rounded-full bg-pizzaro-red" />
-
           <span className="absolute right-[18%] bottom-[22%] h-4 w-4 rounded-full bg-pizzaro-orange" />
         </motion.div>
       </div>
