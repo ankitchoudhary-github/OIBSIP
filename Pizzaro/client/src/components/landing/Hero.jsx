@@ -65,7 +65,7 @@ const Hero = () => {
             className="mt-7 max-w-xl text-lg leading-8 text-pizzaro-muted md:text-xl"
           >
             Pick your favourite, build your own, and make every
-            bite exactly how you like it.
+            bite exactly how you like it. Standard Italian size.
           </motion.p>
 
           <motion.div
