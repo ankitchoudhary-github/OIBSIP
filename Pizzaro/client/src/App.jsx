@@ -39,15 +39,11 @@ useEffect(() => {
 
   if (isCheckout) {
   return (
-    <>
-      <Navbar />
-
-      <Checkout
-        onBack={() => {
-          window.location.hash = "customize";
-        }}
-      />
-    </>
+    <Checkout
+      onBack={() => {
+        window.location.hash = "customize";
+      }}
+    />
   );
 }
 
