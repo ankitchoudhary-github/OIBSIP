@@ -1,3 +1,4 @@
+import HowItWorks from "./components/landing/HowItWorks";
 import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -20,6 +21,7 @@ function Home() {
       <Hero />
       <FeaturedPizzas />
       <PizzaCustomizer />
+      <HowItWorks />
       <Footer />
     </>
   );
