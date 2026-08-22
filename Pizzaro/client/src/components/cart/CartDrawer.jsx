@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Minus,
@@ -7,9 +8,12 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
+
 import { useCart } from "../../context/CartContext";
 
 const CartDrawer = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+
   const {
     cartItems,
     removeFromCart,
@@ -21,6 +25,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
     (total, item) => total + item.quantity,
     0,
   );
+
+  const handleCheckout = () => {
+    onClose();
+    navigate("/checkout");
+  };
 
   return (
     <AnimatePresence>
@@ -70,8 +79,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 >
                   {totalItems === 0
                     ? "Nothing here yet"
-                    : `${totalItems} item${totalItems === 1 ? "" : "s"
-                    }`}
+                    : `${totalItems} item${
+                        totalItems === 1 ? "" : "s"
+                      }`}
                 </motion.p>
               </div>
 
@@ -215,6 +225,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                               </div>
                             )}
 
+                            {/* Menu description */}
                             {item.type === "menu" &&
                               item.description && (
                                 <p className="mt-2 text-xs leading-5 text-pizzaro-muted">
@@ -340,12 +351,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         ₹{subtotal}
                       </motion.p>
                     </div>
+
                     <button
                       type="button"
-                      onClick={() => {
-                        onClose();
-                        window.location.hash = "checkout";
-                      }}
+                      onClick={handleCheckout}
                       className="flex items-center gap-2 rounded-full bg-pizzaro-red px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-pizzaro-red/20 transition hover:bg-pizzaro-red-dark"
                     >
                       Checkout

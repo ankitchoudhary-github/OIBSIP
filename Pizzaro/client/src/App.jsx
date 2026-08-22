@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
-
+import { Routes, Route , useLocation } from "react-router-dom";
+import Menu from "./pages/menu/Menu";
 import CartToast from "./components/ui/CartToast";
 import { useCart } from "./context/CartContext";
 
@@ -12,7 +12,10 @@ import Footer from "./components/layout/Footer";
 
 import Checkout from "./pages/checkout/Checkout";
 
+
 function Home() {
+  const location = useLocation();
+
   const {
     lastAddedItem,
     clearLastAddedItem,
@@ -27,6 +30,24 @@ function Home() {
 
     return () => clearTimeout(timer);
   }, [lastAddedItem, clearLastAddedItem]);
+
+  useEffect(() => {
+    if (!location.state?.openCart) return;
+
+    const timer = setTimeout(() => {
+      window.dispatchEvent(
+        new Event("pizzaro:open-cart"),
+      );
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname,
+      );
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [location.state]);
 
   return (
     <main className="min-h-screen bg-pizzaro-cream">
@@ -45,11 +66,8 @@ function Home() {
       />
 
       <Hero />
-
       <FeaturedPizzas />
-
       <PizzaCustomizer />
-
       <Footer />
     </main>
   );
@@ -59,6 +77,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/menu" element={<Menu />} />
       <Route path="/checkout" element={<Checkout />} />
     </Routes>
   );

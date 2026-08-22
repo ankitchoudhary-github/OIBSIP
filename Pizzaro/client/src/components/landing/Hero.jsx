@@ -1,7 +1,10 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative isolate min-h-[calc(100vh-100px)] overflow-hidden bg-pizzaro-cream px-6 pb-20 pt-32 lg:pt-36">
       {/* Decorative background */}
@@ -32,14 +35,17 @@ const Hero = () => {
         />
       </div>
 
+      {/* Main hero layout */}
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-4">
         {/* Left content */}
         <div className="relative z-10 max-w-2xl">
-          
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.05,
+            }}
             className="mb-4 text-sm font-bold uppercase tracking-[5px] text-pizzaro-red"
           >
             WELCOME TO PIZZARO
@@ -48,7 +54,10 @@ const Hero = () => {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.1,
+            }}
             className="font-display text-6xl font-extrabold leading-[0.92] tracking-[-4px] text-pizzaro-dark sm:text-7xl md:text-8xl lg:text-[96px]"
           >
             Your pizza.
@@ -61,7 +70,10 @@ const Hero = () => {
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.2,
+            }}
             className="mt-7 max-w-xl text-lg leading-8 text-pizzaro-muted md:text-xl"
           >
             Pick your favourite, build your own, and make every
@@ -71,18 +83,16 @@ const Hero = () => {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.3,
+            }}
             className="mt-9 flex flex-wrap gap-3"
           >
+            {/* Order Classics */}
             <button
               type="button"
-              onClick={() => {
-                document
-                  .getElementById("menu")
-                  ?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-              }}
+              onClick={() => navigate("/menu")}
               className="group flex items-center gap-2.5 rounded-full bg-pizzaro-red px-7 py-4 font-semibold text-white shadow-lg shadow-pizzaro-red/20 transition duration-300 hover:-translate-y-0.5 hover:bg-pizzaro-red-dark hover:shadow-xl"
             >
               Order Classics
@@ -93,15 +103,16 @@ const Hero = () => {
               />
             </button>
 
+            {/* Build Your Pizza */}
             <button
               type="button"
-              onClick={() => {
+              onClick={() =>
                 document
                   .getElementById("customize")
                   ?.scrollIntoView({
                     behavior: "smooth",
-                  });
-              }}
+                  })
+              }
               className="rounded-full border border-pizzaro-dark/10 bg-white/80 px-7 py-4 font-semibold text-pizzaro-dark shadow-sm backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-pizzaro-dark/20 hover:bg-white"
             >
               Build Your Pizza
@@ -112,7 +123,10 @@ const Hero = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.5,
+            }}
             className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-pizzaro-muted"
           >
             <span className="flex items-center gap-2">
@@ -132,76 +146,96 @@ const Hero = () => {
           </motion.div>
         </div>
 
-{/* Pizza visual */}
-<motion.div
-  initial={{ opacity: 0, scale: 0.9, x: 30 }}
-  animate={{ opacity: 1, scale: 1, x: 0 }}
-  transition={{
-    duration: 0.8,
-    delay: 0.15,
-    ease: "easeOut",
-  }}
-  className="relative flex min-h-115 items-center justify-center lg:min-h-155"
->
-  {/* Pizza */}
-  <motion.img
-    src="/images/menu/hero-image.png"
-    alt="Freshly prepared Pizzaro pizza"
-    className="relative z-10 w-97.5 object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.18)] sm:w-125 lg:w-155"
-    animate={{
-      y: [0, -8, 0],
-      rotate: [-1, 1, -1],
-    }}
-    transition={{
-      duration: 7,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-  />
+        {/* Pizza visual */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            scale: 0.9,
+            x: 30,
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 0.8,
+            delay: 0.15,
+            ease: "easeOut",
+          }}
+          className="relative flex min-h-115 items-center justify-center lg:min-h-155"
+        >
+          {/* Pizza */}
+          <motion.img
+            src="/images/menu/hero-image.png"
+            alt="Freshly prepared Pizzaro pizza"
+            className="relative z-10 w-97.5 object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.18)] sm:w-125 lg:w-155"
+            animate={{
+              y: [0, -8, 0],
+              rotate: [-1, 1, -1],
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
 
-  {/* Floating label */}
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{
-      delay: 0.8,
-      duration: 0.4,
-    }}
-    className="absolute right-0 top-[18%] z-20 rounded-2xl border border-black/5 bg-white/90 px-4 py-3 shadow-lg backdrop-blur sm:right-[4%]"
-  >
-    <p className="text-[10px] font-bold uppercase tracking-[2px] text-pizzaro-red">
-      Fan favourite
-    </p>
+          {/* Floating label */}
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            transition={{
+              delay: 0.8,
+              duration: 0.4,
+            }}
+            className="absolute right-0 top-[18%] z-20 rounded-2xl border border-black/5 bg-white/90 px-4 py-3 shadow-lg backdrop-blur sm:right-[4%]"
+          >
+            <p className="text-[10px] font-bold uppercase tracking-[2px] text-pizzaro-red">
+              Fan favourite
+            </p>
 
-    <p className="mt-1 font-display text-lg font-bold text-pizzaro-dark">
-      Bombay
-    </p>
-  </motion.div>
+            <p className="mt-1 font-display text-lg font-bold text-pizzaro-dark">
+              Bombay
+            </p>
+          </motion.div>
 
-  {/* Floating customization badge */}
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{
-      delay: 1,
-      duration: 0.4,
-    }}
-    className="absolute bottom-[12%] left-0 z-20 rounded-2xl bg-pizzaro-dark px-5 py-4 text-white shadow-xl sm:left-[4%]"
-  >
-    <p className="text-xs text-white/60">
-      Make it yours
-    </p>
+          {/* Floating customization badge */}
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            transition={{
+              delay: 1,
+              duration: 0.4,
+            }}
+            className="absolute bottom-[12%] left-0 z-20 rounded-2xl bg-pizzaro-dark px-5 py-4 text-white shadow-xl sm:left-[4%]"
+          >
+            <p className="text-xs text-white/60">
+              Make it yours
+            </p>
 
-    <p className="mt-1 font-display text-xl font-bold">
-      Choose your toppings
-    </p>
-  </motion.div>
+            <p className="mt-1 font-display text-xl font-bold">
+              Choose your toppings
+            </p>
+          </motion.div>
 
-  {/* Tiny decorative dots */}
-  <span className="absolute left-[14%] top-[18%] h-3 w-3 rounded-full bg-pizzaro-red" />
+          {/* Tiny decorative dots */}
+          <span className="absolute left-[14%] top-[18%] h-3 w-3 rounded-full bg-pizzaro-red" />
 
-  <span className="absolute right-[18%] bottom-[22%] h-4 w-4 rounded-full bg-pizzaro-orange" />
-</motion.div>
+          <span className="absolute right-[18%] bottom-[22%] h-4 w-4 rounded-full bg-pizzaro-orange" />
+        </motion.div>
       </div>
 
       {/* Bottom transition */}

@@ -1,8 +1,10 @@
 import { ArrowLeft, MapPin, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 const Checkout = ({ onBack }) => {
+  const navigate = useNavigate();
   const {
     cartItems,
     subtotal,
@@ -69,7 +71,13 @@ const Checkout = ({ onBack }) => {
         {/* Back */}
         <button
           type="button"
-          onClick={onBack}
+          onClick={() => {
+            navigate("/", {
+              state: {
+                openCart: true,
+              },
+            });
+          }}
           className="mb-8 flex items-center gap-2 text-sm font-semibold text-pizzaro-dark transition hover:text-pizzaro-red"
         >
           <ArrowLeft size={18} />
