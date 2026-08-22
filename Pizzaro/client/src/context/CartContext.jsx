@@ -1,10 +1,58 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const CartContext = createContext(null);
+export const CartContext = createContext(null);
+
+const CART_STORAGE_KEY = "pizzaro-cart";
+
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
-  const [lastAddedItem, setLastAddedItem] = useState(null);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const savedCart =
+        localStorage.getItem(CART_STORAGE_KEY);
 
+      if (!savedCart) {
+        return [];
+      }
+
+      const parsedCart = JSON.parse(savedCart);
+
+      return Array.isArray(parsedCart)
+        ? parsedCart
+        : [];
+    } catch (error) {
+      console.error(
+        "Failed to load cart from localStorage:",
+        error,
+      );
+
+      return [];
+    }
+  });
+
+  const [lastAddedItem, setLastAddedItem] =
+    useState(null);
+
+  /* Save cart whenever it changes */
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        CART_STORAGE_KEY,
+        JSON.stringify(cartItems),
+      );
+    } catch (error) {
+      console.error(
+        "Failed to save cart to localStorage:",
+        error,
+      );
+    }
+  }, [cartItems]);
+
+  /* Add to cart */
   const addToCart = (item) => {
     setCartItems((currentItems) => {
       const existingItem = currentItems.find(
@@ -15,10 +63,11 @@ export function CartProvider({ children }) {
         return currentItems.map((cartItem) =>
           cartItem.id === item.id
             ? {
-              ...cartItem,
-              quantity:
-                cartItem.quantity + (item.quantity ?? 1),
-            }
+                ...cartItem,
+                quantity:
+                  cartItem.quantity +
+                  (item.quantity ?? 1),
+              }
             : cartItem,
         );
       }
@@ -35,16 +84,21 @@ export function CartProvider({ children }) {
     setLastAddedItem(item);
   };
 
+  /* Clear toast item */
   const clearLastAddedItem = () => {
     setLastAddedItem(null);
   };
 
+  /* Remove item */
   const removeFromCart = (id) => {
     setCartItems((currentItems) =>
-      currentItems.filter((item) => item.id !== id)
+      currentItems.filter(
+        (item) => item.id !== id,
+      ),
     );
   };
 
+  /* Update quantity */
   const updateQuantity = (id, quantity) => {
     if (quantity <= 0) {
       removeFromCart(id);
@@ -54,58 +108,55 @@ export function CartProvider({ children }) {
     setCartItems((currentItems) =>
       currentItems.map((item) =>
         item.id === id
-          ? { ...item, quantity }
-          : item
-      )
+          ? {
+              ...item,
+              quantity,
+            }
+          : item,
+      ),
     );
   };
 
+  /* Clear cart */
   const clearCart = () => {
     setCartItems([]);
   };
 
+  /* Total item count */
   const totalItems = useMemo(() => {
     return cartItems.reduce(
-      (total, item) => total + item.quantity,
-      0
+      (total, item) =>
+        total + (item.quantity ?? 0),
+      0,
     );
   }, [cartItems]);
 
+  /* Subtotal */
   const subtotal = useMemo(() => {
     return cartItems.reduce(
       (total, item) =>
-        total + item.price * item.quantity,
-      0
+        total +
+        (item.price ?? 0) *
+          (item.quantity ?? 0),
+      0,
     );
   }, [cartItems]);
 
   return (
     <CartContext.Provider
-  value={{
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    totalItems,
-    subtotal,
-    lastAddedItem,
-    clearLastAddedItem,
-  }}
->
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        subtotal,
+        lastAddedItem,
+        clearLastAddedItem,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
-}
-
-export function useCart() {
-  const context = useContext(CartContext);
-
-  if (!context) {
-    throw new Error(
-      "useCart must be used inside CartProvider"
-    );
-  }
-
-  return context;
 }

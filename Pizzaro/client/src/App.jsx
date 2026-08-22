@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { Routes, Route , useLocation } from "react-router-dom";
-import Menu from "./pages/menu/Menu";
+import { Routes, Route } from "react-router-dom";
+
 import CartToast from "./components/ui/CartToast";
-import { useCart } from "./context/CartContext";
+import { useCart } from "./context/useCart";
 
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/landing/Hero";
@@ -10,12 +10,22 @@ import FeaturedPizzas from "./components/landing/FeaturedPizzas";
 import PizzaCustomizer from "./components/customize/PizzaCustomizer";
 import Footer from "./components/layout/Footer";
 
+import Menu from "./pages/menu/Menu";
 import Checkout from "./pages/checkout/Checkout";
 
-
 function Home() {
-  const location = useLocation();
+  return (
+    <>
+      <Navbar />
+      <Hero />
+      <FeaturedPizzas />
+      <PizzaCustomizer />
+      <Footer />
+    </>
+  );
+}
 
+function App() {
   const {
     lastAddedItem,
     clearLastAddedItem,
@@ -31,28 +41,9 @@ function Home() {
     return () => clearTimeout(timer);
   }, [lastAddedItem, clearLastAddedItem]);
 
-  useEffect(() => {
-    if (!location.state?.openCart) return;
-
-    const timer = setTimeout(() => {
-      window.dispatchEvent(
-        new Event("pizzaro:open-cart"),
-      );
-
-      window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname,
-      );
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [location.state]);
-
   return (
     <main className="min-h-screen bg-pizzaro-cream">
-      <Navbar />
-
+      {/* Global cart toast */}
       <CartToast
         item={lastAddedItem}
         onClose={clearLastAddedItem}
@@ -65,21 +56,20 @@ function Home() {
         }}
       />
 
-      <Hero />
-      <FeaturedPizzas />
-      <PizzaCustomizer />
-      <Footer />
-    </main>
-  );
-}
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/menu" element={<Menu />} />
-      <Route path="/checkout" element={<Checkout />} />
-    </Routes>
+        <Route
+          path="/menu"
+          element={<Menu />}
+        />
+
+        <Route
+          path="/checkout"
+          element={<Checkout />}
+        />
+      </Routes>
+    </main>
   );
 }
 

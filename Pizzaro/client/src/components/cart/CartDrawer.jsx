@@ -9,7 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const navigate = useNavigate();

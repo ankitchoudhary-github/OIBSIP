@@ -7,7 +7,7 @@ import {
 
 import Navbar from "../../components/layout/Navbar";
 
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 import { pizzas } from "../../data/pizzas";
 
 const Menu = () => {

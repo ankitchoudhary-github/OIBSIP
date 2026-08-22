@@ -4,7 +4,7 @@ import { ShoppingBag, Menu } from "lucide-react";
 
 import Button from "../ui/Button";
 import CartDrawer from "../cart/CartDrawer";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 
 export const CART_OPEN_EVENT = "pizzaro:open-cart";
 
