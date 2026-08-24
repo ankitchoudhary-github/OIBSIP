@@ -1,44 +1,66 @@
 import {
   createPaymentForOrder,
+  verifyRazorpayPayment,
 } from "../services/paymentService.js";
 
-export async function createPaymentController(
-  req,
-  res,
-) {
+export async function createPaymentController(req, res) {
   try {
     const { orderId } = req.body;
 
-    const result =
-      await createPaymentForOrder(orderId);
+    const result = await createPaymentForOrder(orderId);
 
     return res.status(201).json({
       success: true,
-      message:
-        "Razorpay order created successfully.",
+      message: "Razorpay order created successfully.",
 
       payment: {
-        keyId:
-          process.env.RAZORPAY_KEY_ID,
+        keyId: process.env.RAZORPAY_KEY_ID,
 
-        orderId:
-          result.razorpayOrder.id,
+        orderId: result.razorpayOrder.id,
 
-        amount:
-          result.razorpayOrder.amount,
+        amount: result.razorpayOrder.amount,
 
-        currency:
-          result.razorpayOrder.currency,
+        currency: result.razorpayOrder.currency,
 
-        mongoOrderId:
-          result.order._id,
+        mongoOrderId: result.order._id,
       },
     });
   } catch (error) {
-    console.error(
-      "Create payment error:",
-      error.message,
-    );
+    console.error("Create payment error:", error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function verifyPaymentController(req, res) {
+  try {
+    const {
+      mongoOrderId,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+    } = req.body;
+
+    const result = await verifyRazorpayPayment({
+      mongoOrderId,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: result.alreadyPaid
+        ? "Payment was already verified."
+        : "Payment verified successfully.",
+
+      order: result.order,
+    });
+  } catch (error) {
+    console.error("Verify payment error:", error.message);
 
     return res.status(400).json({
       success: false,

@@ -32,210 +32,260 @@ const Checkout = ({ onBack }) => {
   };
 
   const handleSubmit = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  const {
-    name,
-    phone,
-    address,
-    city,
-    state,
-    pincode,
-  } = form;
+    const {
+      name,
+      phone,
+      address,
+      city,
+      state,
+      pincode,
+    } = form;
 
-  /* =========================
-     VALIDATE DELIVERY DETAILS
-  ========================== */
-
-  if (
-    !name.trim() ||
-    !phone.trim() ||
-    !address.trim() ||
-    !city.trim() ||
-    !state.trim() ||
-    !pincode.trim()
-  ) {
-    setError(
-      "Please fill in all delivery details.",
-    );
-    return;
-  }
-
-  setError("");
-
-  try {
     /* =========================
-       STEP 1
-       CREATE MONGODB ORDER
+       VALIDATE DELIVERY DETAILS
     ========================== */
 
-    const orderResponse = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: cartItems.map((item) => {
-            if (item.type === "custom") {
+    if (
+      !name.trim() ||
+      !phone.trim() ||
+      !address.trim() ||
+      !city.trim() ||
+      !state.trim() ||
+      !pincode.trim()
+    ) {
+      setError(
+        "Please fill in all delivery details.",
+      );
+      return;
+    }
+
+    setError("");
+
+    try {
+      /* =========================
+         STEP 1
+         CREATE MONGODB ORDER
+      ========================== */
+
+      const orderResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items: cartItems.map((item) => {
+              if (item.type === "custom") {
+                return {
+                  type: "custom",
+                  quantity: item.quantity,
+                  customization: {
+                    baseId: item.baseId,
+                    sauceId: item.sauceId,
+                    cheeseId: item.cheeseId,
+                    vegetableIds:
+                      item.vegetableIds,
+                  },
+                };
+              }
+
               return {
-                type: "custom",
+                type: "menu",
+                productId: item.id,
                 quantity: item.quantity,
-                customization: {
-                  baseId: item.baseId,
-                  sauceId: item.sauceId,
-                  cheeseId: item.cheeseId,
-                  vegetableIds:
-                    item.vegetableIds,
-                },
               };
+            }),
+
+            customer: {
+              name: name.trim(),
+              phone: phone.trim(),
+              address: address.trim(),
+              city: city.trim(),
+              state: state.trim(),
+              pincode: pincode.trim(),
+            },
+          }),
+        },
+      );
+
+      const orderData =
+        await orderResponse.json();
+
+      if (!orderResponse.ok) {
+        throw new Error(
+          orderData.message ||
+          "Failed to create order.",
+        );
+      }
+
+      const mongoOrder =
+        orderData.order;
+
+      console.log(
+        "MongoDB order created:",
+        mongoOrder,
+      );
+
+      /* =========================
+         STEP 2
+         CREATE RAZORPAY ORDER
+      ========================== */
+
+      const paymentResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/payments/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId: mongoOrder._id,
+          }),
+        },
+      );
+
+      const paymentData =
+        await paymentResponse.json();
+
+      if (!paymentResponse.ok) {
+        throw new Error(
+          paymentData.message ||
+          "Failed to create payment.",
+        );
+      }
+
+      console.log(
+        "Razorpay order created:",
+        paymentData,
+      );
+
+      /* =========================
+         STEP 3
+         OPEN RAZORPAY CHECKOUT
+      ========================== */
+
+      if (typeof window.Razorpay !== "function") {
+        throw new Error(
+          "Razorpay Checkout failed to load.",
+        );
+      }
+
+      const options = {
+        key: paymentData.payment.keyId,
+
+        amount:
+          paymentData.payment.amount,
+
+        currency:
+          paymentData.payment.currency,
+
+        name: "Pizzaro",
+
+        description:
+          "Pizzaro Pizza Order",
+
+        order_id:
+          paymentData.payment.orderId,
+
+        prefill: {
+          name: name.trim(),
+          contact: phone.trim(),
+        },
+
+        notes: {
+          mongoOrderId:
+            mongoOrder._id,
+        },
+
+        theme: {
+          color: "#e53935",
+        },
+
+        handler: async function (response) {
+          try {
+            console.log(
+              "Razorpay payment response:",
+              response,
+            );
+
+            const verifyResponse = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/payments/verify`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  mongoOrderId: mongoOrder._id,
+                  razorpayPaymentId:
+                    response.razorpay_payment_id,
+                  razorpayOrderId:
+                    response.razorpay_order_id,
+                  razorpaySignature:
+                    response.razorpay_signature,
+                }),
+              },
+            );
+
+            const verifyData =
+              await verifyResponse.json();
+
+            if (!verifyResponse.ok) {
+              throw new Error(
+                verifyData.message ||
+                "Payment verification failed.",
+              );
             }
 
-            return {
-              type: "menu",
-              productId: item.id,
-              quantity: item.quantity,
-            };
-          }),
+            console.log(
+              "Payment verified successfully:",
+              verifyData.order,
+            );
 
-          customer: {
-            name: name.trim(),
-            phone: phone.trim(),
-            address: address.trim(),
-            city: city.trim(),
-            state: state.trim(),
-            pincode: pincode.trim(),
+            // We'll improve this UI after verification works.
+            alert("Payment successful!");
+          } catch (error) {
+            console.error(
+              "Payment verification error:",
+              error,
+            );
+
+            setError(
+              error.message ||
+              "Payment could not be verified.",
+            );
+          }
+        },
+
+        
+        modal: {
+          ondismiss: function () {
+            console.log(
+              "Razorpay Checkout closed.",
+            );
           },
-        }),
-      },
-    );
-
-    const orderData =
-      await orderResponse.json();
-
-    if (!orderResponse.ok) {
-      throw new Error(
-        orderData.message ||
-          "Failed to create order.",
-      );
-    }
-
-    const mongoOrder =
-      orderData.order;
-
-    console.log(
-      "MongoDB order created:",
-      mongoOrder,
-    );
-
-    /* =========================
-       STEP 2
-       CREATE RAZORPAY ORDER
-    ========================== */
-
-    const paymentResponse = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/payments/create`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          orderId: mongoOrder._id,
-        }),
-      },
-    );
+      };
 
-    const paymentData =
-      await paymentResponse.json();
+      const razorpay =
+        new window.Razorpay(options);
 
-    if (!paymentResponse.ok) {
-      throw new Error(
-        paymentData.message ||
-          "Failed to create payment.",
+      razorpay.open();
+    } catch (error) {
+      console.error(
+        "Checkout error:",
+        error,
       );
-    }
 
-    console.log(
-      "Razorpay order created:",
-      paymentData,
-    );
-
-    /* =========================
-       STEP 3
-       OPEN RAZORPAY CHECKOUT
-    ========================== */
-
-    if (typeof window.Razorpay !== "function") {
-      throw new Error(
-        "Razorpay Checkout failed to load.",
-      );
-    }
-
-    const options = {
-      key: paymentData.payment.keyId,
-
-      amount:
-        paymentData.payment.amount,
-
-      currency:
-        paymentData.payment.currency,
-
-      name: "Pizzaro",
-
-      description:
-        "Pizzaro Pizza Order",
-
-      order_id:
-        paymentData.payment.orderId,
-
-      prefill: {
-        name: name.trim(),
-        contact: phone.trim(),
-      },
-
-      notes: {
-        mongoOrderId:
-          mongoOrder._id,
-      },
-
-      theme: {
-        color: "#e53935",
-      },
-
-      handler: function (response) {
-        console.log(
-          "Razorpay payment response:",
-          response,
-        );
-      },
-
-      modal: {
-        ondismiss: function () {
-          console.log(
-            "Razorpay Checkout closed.",
-          );
-        },
-      },
-    };
-
-    const razorpay =
-      new window.Razorpay(options);
-
-    razorpay.open();
-  } catch (error) {
-    console.error(
-      "Checkout error:",
-      error,
-    );
-
-    setError(
-      error.message ||
+      setError(
+        error.message ||
         "Something went wrong during checkout.",
-    );
-  }
-};
+      );
+    }
+  };
 
   return (
     <main className="min-h-screen bg-pizzaro-cream px-6 pb-20 pt-32">
