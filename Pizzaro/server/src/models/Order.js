@@ -166,7 +166,7 @@ const orderSchema = new mongoose.Schema(
         default: null,
       },
 
-      orderId: {
+      razorpayOrderId: {            //orderID to razorpayOrderId
         type: String,
         default: null,
       },
