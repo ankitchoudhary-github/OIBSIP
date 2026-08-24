@@ -31,39 +31,77 @@ const Checkout = ({ onBack }) => {
     }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    const {
-      name,
-      phone,
-      address,
-      city,
-      state,
-      pincode,
-    } = form;
+  const {
+    name,
+    phone,
+    address,
+    city,
+    state,
+    pincode,
+  } = form;
 
-    if (
-      !name.trim() ||
-      !phone.trim() ||
-      !address.trim() ||
-      !city.trim() ||
-      !state.trim() ||
-      !pincode.trim()
-    ) {
-      setError("Please fill in all delivery details.");
-      return;
+  if (
+    !name.trim() ||
+    !phone.trim() ||
+    !address.trim() ||
+    !city.trim() ||
+    !state.trim() ||
+    !pincode.trim()
+  ) {
+    setError("Please fill in all delivery details.");
+    return;
+  }
+
+  setError("");
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cartItems.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+
+          customer: {
+            name: name.trim(),
+            phone: phone.trim(),
+            address: address.trim(),
+            city: city.trim(),
+            state: state.trim(),
+            pincode: pincode.trim(),
+          },
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to create order.",
+      );
     }
 
-    setError("");
+    console.log("Order created:", data.order);
 
-    console.log("Checkout data", {
-      customer: form,
-      items: cartItems,
-      suggestions: orderSuggestions,
-      subtotal,
-    });
-  };
+  } catch (error) {
+    console.error("Checkout error:", error);
+
+    setError(
+      error.message ||
+        "Something went wrong while creating your order.",
+    );
+  }
+};
 
   return (
     <main className="min-h-screen bg-pizzaro-cream px-6 pb-20 pt-32">
