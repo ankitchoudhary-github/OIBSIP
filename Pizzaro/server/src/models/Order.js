@@ -1,10 +1,47 @@
 import mongoose from "mongoose";
 
+const customizationSchema = new mongoose.Schema(
+  {
+    baseId: {
+      type: String,
+      default: null,
+    },
+
+    sauceId: {
+      type: String,
+      default: null,
+    },
+
+    cheeseId: {
+      type: String,
+      default: null,
+    },
+
+    vegetableIds: {
+      type: [String],
+      default: [],
+    },
+  },
+  {
+    _id: false,
+  },
+);
+
 const orderItemSchema = new mongoose.Schema(
   {
+    type: {
+      type: String,
+      enum: ["menu", "custom"],
+      required: true,
+    },
+
+    /*
+      Used for normal menu pizzas.
+      Custom pizzas do not use this field.
+    */
     productId: {
       type: String,
-      required: true,
+      default: null,
       trim: true,
     },
 
@@ -21,8 +58,15 @@ const orderItemSchema = new mongoose.Schema(
     },
 
     /*
-      This is the trusted price captured
-      when the order is created.
+      Custom pizza configuration snapshot.
+    */
+    customization: {
+      type: customizationSchema,
+      default: null,
+    },
+
+    /*
+      Trusted price captured at order creation.
     */
     unitPrice: {
       type: Number,
@@ -112,11 +156,7 @@ const orderSchema = new mongoose.Schema(
     payment: {
       status: {
         type: String,
-        enum: [
-          "pending",
-          "paid",
-          "failed",
-        ],
+        enum: ["pending", "paid", "failed"],
         default: "pending",
       },
 
