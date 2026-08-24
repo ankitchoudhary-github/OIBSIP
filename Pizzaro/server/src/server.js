@@ -1,3 +1,5 @@
+import orderRoutes from "./routes/orderRoutes.js";
+
 import "dotenv/config";
 
 import express from "express";
@@ -21,8 +23,9 @@ app.use(
 );
 
 app.use(helmet());
-
 app.use(express.json());
+
+app.use("/api/orders", orderRoutes);
 
 /* =========================
    HEALTH CHECK
