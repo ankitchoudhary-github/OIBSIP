@@ -1,3 +1,5 @@
+import paymentRoutes from "./routes/paymentRoutes.js";
+
 import orderRoutes from "./routes/orderRoutes.js";
 
 import "dotenv/config";
@@ -26,6 +28,7 @@ app.use(helmet());
 app.use(express.json());
 
 app.use("/api/orders", orderRoutes);
+app.use("/api/payments", paymentRoutes);
 
 /* =========================
    HEALTH CHECK
