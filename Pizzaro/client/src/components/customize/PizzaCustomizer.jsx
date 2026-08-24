@@ -228,46 +228,42 @@ const PizzaCustomizer = () => {
     ].join("|");
   };
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: createCustomPizzaId(),
+ const handleAddToCart = () => {
+  addToCart({
+    id: createCustomPizzaId(),
 
-      type: "custom",
+    type: "custom",
 
-      name: `${selectedBase} Pizza`,
+    name: `${selectedBase} Pizza`,
 
-      image: "/images/menu/customizer-pizza.png",
+    image: "/images/menu/customizer-pizza.png",
 
-      /*
-        These IDs are what the backend will trust
-        and validate against MongoDB.
-      */
-      baseId: toOptionId(selectedBase),
+    // Backend identifiers
+    baseId: toOptionId(selectedBase),
+    sauceId: toOptionId(selectedSauce),
+    cheeseId: toOptionId(selectedCheese),
+    vegetableIds: [...selectedVegetables]
+      .map(toOptionId)
+      .sort(),
 
-      sauceId: toOptionId(selectedSauce),
+    // UI display values
+    base: selectedBase,
+    sauce: selectedSauce,
+    cheese: selectedCheese,
+    vegetables: [...selectedVegetables],
 
-      cheeseId: toOptionId(selectedCheese),
+    // Display-only price
+    price: totalPrice,
 
-      vegetableIds: [...selectedVegetables]
-        .map(toOptionId)
-        .sort(),
+    quantity: 1,
+  });
 
-      /*
-        Keep the frontend price for display/cart UI.
-        The backend MUST NOT trust this value.
-      */
-      price: totalPrice,
-
-      quantity: 1,
-    });
-
-    // Reset builder for the next pizza
-    setSelectedBase("Classic");
-    setSelectedSauce("Classic Tomato");
-    setSelectedCheese("Mozzarella");
-    setSelectedVegetables([]);
-    setCurrentStep(0);
-  };
+  setSelectedBase("Classic");
+  setSelectedSauce("Classic Tomato");
+  setSelectedCheese("Mozzarella");
+  setSelectedVegetables([]);
+  setCurrentStep(0);
+};
 
 
   const canGoNext = currentStep < steps.length - 1;

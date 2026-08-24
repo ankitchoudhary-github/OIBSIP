@@ -32,92 +32,210 @@ const Checkout = ({ onBack }) => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    const {
-      name,
-      phone,
-      address,
-      city,
-      state,
-      pincode,
-    } = form;
+  const {
+    name,
+    phone,
+    address,
+    city,
+    state,
+    pincode,
+  } = form;
 
-    if (
-      !name.trim() ||
-      !phone.trim() ||
-      !address.trim() ||
-      !city.trim() ||
-      !state.trim() ||
-      !pincode.trim()
-    ) {
-      setError("Please fill in all delivery details.");
-      return;
-    }
+  /* =========================
+     VALIDATE DELIVERY DETAILS
+  ========================== */
 
-    setError("");
+  if (
+    !name.trim() ||
+    !phone.trim() ||
+    !address.trim() ||
+    !city.trim() ||
+    !state.trim() ||
+    !pincode.trim()
+  ) {
+    setError(
+      "Please fill in all delivery details.",
+    );
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/orders`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            items: cartItems.map((item) => {
-              if (item.type === "custom") {
-                return {
-                  type: "custom",
-                  quantity: item.quantity,
-                  customization: {
-                    baseId: item.baseId,
-                    sauceId: item.sauceId,
-                    cheeseId: item.cheeseId,
-                    vegetableIds: item.vegetableIds,
-                  },
-                };
-              }
+  setError("");
 
-              return {
-                type: "menu",
-                productId: item.id,
-                quantity: item.quantity,
-              };
-            }),
+  try {
+    /* =========================
+       STEP 1
+       CREATE MONGODB ORDER
+    ========================== */
 
-            customer: {
-              name: name.trim(),
-              phone: phone.trim(),
-              address: address.trim(),
-              city: city.trim(),
-              state: state.trim(),
-              pincode: pincode.trim(),
-            },
-          }),
+    const orderResponse = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          items: cartItems.map((item) => {
+            if (item.type === "custom") {
+              return {
+                type: "custom",
+                quantity: item.quantity,
+                customization: {
+                  baseId: item.baseId,
+                  sauceId: item.sauceId,
+                  cheeseId: item.cheeseId,
+                  vegetableIds:
+                    item.vegetableIds,
+                },
+              };
+            }
 
-      const data = await response.json();
+            return {
+              type: "menu",
+              productId: item.id,
+              quantity: item.quantity,
+            };
+          }),
 
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to create order.",
-        );
-      }
+          customer: {
+            name: name.trim(),
+            phone: phone.trim(),
+            address: address.trim(),
+            city: city.trim(),
+            state: state.trim(),
+            pincode: pincode.trim(),
+          },
+        }),
+      },
+    );
 
-      console.log("Order created:", data.order);
+    const orderData =
+      await orderResponse.json();
 
-    } catch (error) {
-      console.error("Checkout error:", error);
-
-      setError(
-        error.message ||
-        "Something went wrong while creating your order.",
+    if (!orderResponse.ok) {
+      throw new Error(
+        orderData.message ||
+          "Failed to create order.",
       );
     }
-  };
+
+    const mongoOrder =
+      orderData.order;
+
+    console.log(
+      "MongoDB order created:",
+      mongoOrder,
+    );
+
+    /* =========================
+       STEP 2
+       CREATE RAZORPAY ORDER
+    ========================== */
+
+    const paymentResponse = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/payments/create`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: mongoOrder._id,
+        }),
+      },
+    );
+
+    const paymentData =
+      await paymentResponse.json();
+
+    if (!paymentResponse.ok) {
+      throw new Error(
+        paymentData.message ||
+          "Failed to create payment.",
+      );
+    }
+
+    console.log(
+      "Razorpay order created:",
+      paymentData,
+    );
+
+    /* =========================
+       STEP 3
+       OPEN RAZORPAY CHECKOUT
+    ========================== */
+
+    if (typeof window.Razorpay !== "function") {
+      throw new Error(
+        "Razorpay Checkout failed to load.",
+      );
+    }
+
+    const options = {
+      key: paymentData.payment.keyId,
+
+      amount:
+        paymentData.payment.amount,
+
+      currency:
+        paymentData.payment.currency,
+
+      name: "Pizzaro",
+
+      description:
+        "Pizzaro Pizza Order",
+
+      order_id:
+        paymentData.payment.orderId,
+
+      prefill: {
+        name: name.trim(),
+        contact: phone.trim(),
+      },
+
+      notes: {
+        mongoOrderId:
+          mongoOrder._id,
+      },
+
+      theme: {
+        color: "#e53935",
+      },
+
+      handler: function (response) {
+        console.log(
+          "Razorpay payment response:",
+          response,
+        );
+      },
+
+      modal: {
+        ondismiss: function () {
+          console.log(
+            "Razorpay Checkout closed.",
+          );
+        },
+      },
+    };
+
+    const razorpay =
+      new window.Razorpay(options);
+
+    razorpay.open();
+  } catch (error) {
+    console.error(
+      "Checkout error:",
+      error,
+    );
+
+    setError(
+      error.message ||
+        "Something went wrong during checkout.",
+    );
+  }
+};
 
   return (
     <main className="min-h-screen bg-pizzaro-cream px-6 pb-20 pt-32">
