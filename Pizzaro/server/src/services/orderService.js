@@ -5,24 +5,17 @@ import CustomizationOption from "../models/CustomizationOption.js";
 const MAX_QUANTITY_PER_ITEM = 20;
 const MAX_ITEMS_PER_ORDER = 50;
 
-export async function createOrder({
-  items,
-  customer,
-}) {
+export async function createOrder({ items, customer }) {
   /* =========================
      BASIC ORDER VALIDATION
   ========================== */
 
   if (!Array.isArray(items) || items.length === 0) {
-    throw new Error(
-      "Order must contain at least one item.",
-    );
+    throw new Error("Order must contain at least one item.");
   }
 
   if (items.length > MAX_ITEMS_PER_ORDER) {
-    throw new Error(
-      "Order contains too many different items.",
-    );
+    throw new Error("Order contains too many different items.");
   }
 
   /* =========================
@@ -38,23 +31,13 @@ export async function createOrder({
     "pincode",
   ];
 
-  if (
-    !customer ||
-    typeof customer !== "object"
-  ) {
-    throw new Error(
-      "Customer details are required.",
-    );
+  if (!customer || typeof customer !== "object") {
+    throw new Error("Customer details are required.");
   }
 
   for (const field of requiredCustomerFields) {
-    if (
-      typeof customer[field] !== "string" ||
-      !customer[field].trim()
-    ) {
-      throw new Error(
-        `Customer ${field} is required.`,
-      );
+    if (typeof customer[field] !== "string" || !customer[field].trim()) {
+      throw new Error(`Customer ${field} is required.`);
     }
   }
 
@@ -67,46 +50,31 @@ export async function createOrder({
 
   for (const [index, item] of items.entries()) {
     if (!item || typeof item !== "object") {
-      throw new Error(
-        `Invalid item at position ${index + 1}.`,
-      );
+      throw new Error(`Invalid item at position ${index + 1}.`);
     }
 
     const type = item.type ?? "menu";
 
     if (!["menu", "custom"].includes(type)) {
-      throw new Error(
-        `Invalid item type at position ${index + 1}.`,
-      );
+      throw new Error(`Invalid item type at position ${index + 1}.`);
     }
 
     const quantity = Number(item.quantity);
 
-    if (
-      !Number.isInteger(quantity) ||
-      quantity <= 0
-    ) {
-      throw new Error(
-        `Quantity must be a positive integer.`,
-      );
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      throw new Error(`Quantity must be a positive integer.`);
     }
 
     if (quantity > MAX_QUANTITY_PER_ITEM) {
-      throw new Error(
-        `Quantity cannot exceed ${MAX_QUANTITY_PER_ITEM}.`,
-      );
+      throw new Error(`Quantity cannot exceed ${MAX_QUANTITY_PER_ITEM}.`);
     }
 
     if (type === "menu") {
       const productId =
-        typeof item.productId === "string"
-          ? item.productId.trim()
-          : "";
+        typeof item.productId === "string" ? item.productId.trim() : "";
 
       if (!productId) {
-        throw new Error(
-          `Menu item ${index + 1} is missing productId.`,
-        );
+        throw new Error(`Menu item ${index + 1} is missing productId.`);
       }
 
       const itemKey = `menu:${productId}`;
@@ -132,16 +100,10 @@ export async function createOrder({
        CUSTOM PIZZA VALIDATION
     ========================== */
 
-    const customization =
-      item.customization;
+    const customization = item.customization;
 
-    if (
-      !customization ||
-      typeof customization !== "object"
-    ) {
-      throw new Error(
-        "Custom pizza configuration is required.",
-      );
+    if (!customization || typeof customization !== "object") {
+      throw new Error("Custom pizza configuration is required.");
     }
 
     const baseId =
@@ -159,39 +121,24 @@ export async function createOrder({
         ? customization.cheeseId.trim()
         : "";
 
-    const vegetableIds = Array.isArray(
-      customization.vegetableIds,
-    )
+    const vegetableIds = Array.isArray(customization.vegetableIds)
       ? customization.vegetableIds
-          .filter(
-            (id) => typeof id === "string",
-          )
+          .filter((id) => typeof id === "string")
           .map((id) => id.trim())
       : [];
 
     if (!baseId || !sauceId || !cheeseId) {
-      throw new Error(
-        "Custom pizza must include a base, sauce, and cheese.",
-      );
+      throw new Error("Custom pizza must include a base, sauce, and cheese.");
     }
 
     if (vegetableIds.length > 8) {
-      throw new Error(
-        "Too many vegetables selected.",
-      );
+      throw new Error("Too many vegetables selected.");
     }
 
-    const uniqueVegetableIds = [
-      ...new Set(vegetableIds),
-    ];
+    const uniqueVegetableIds = [...new Set(vegetableIds)];
 
-    if (
-      uniqueVegetableIds.length !==
-      vegetableIds.length
-    ) {
-      throw new Error(
-        "Duplicate vegetables are not allowed.",
-      );
+    if (uniqueVegetableIds.length !== vegetableIds.length) {
+      throw new Error("Duplicate vegetables are not allowed.");
     }
 
     const customKey = [
@@ -203,9 +150,7 @@ export async function createOrder({
     ].join(":");
 
     if (seenItemKeys.has(customKey)) {
-      throw new Error(
-        "Duplicate custom pizza configurations are not allowed.",
-      );
+      throw new Error("Duplicate custom pizza configurations are not allowed.");
     }
 
     seenItemKeys.add(customKey);
@@ -226,13 +171,9 @@ export async function createOrder({
      FETCH NORMAL PIZZAS
   ========================== */
 
-  const menuItems = normalizedItems.filter(
-    (item) => item.type === "menu",
-  );
+  const menuItems = normalizedItems.filter((item) => item.type === "menu");
 
-  const menuProductIds = menuItems.map(
-    (item) => item.productId,
-  );
+  const menuProductIds = menuItems.map((item) => item.productId);
 
   const pizzas =
     menuProductIds.length > 0
@@ -244,12 +185,7 @@ export async function createOrder({
         })
       : [];
 
-  const pizzaMap = new Map(
-    pizzas.map((pizza) => [
-      pizza.productId,
-      pizza,
-    ]),
-  );
+  const pizzaMap = new Map(pizzas.map((pizza) => [pizza.productId, pizza]));
 
   for (const item of menuItems) {
     if (!pizzaMap.has(item.productId)) {
@@ -263,27 +199,18 @@ export async function createOrder({
      PREPARE CUSTOM OPTION IDS
   ========================== */
 
-  const customItems = normalizedItems.filter(
-    (item) => item.type === "custom",
-  );
+  const customItems = normalizedItems.filter((item) => item.type === "custom");
 
   const customOptionIds = new Set();
 
   for (const item of customItems) {
-    customOptionIds.add(
-      item.customization.baseId,
-    );
+    customOptionIds.add(item.customization.baseId);
 
-    customOptionIds.add(
-      item.customization.sauceId,
-    );
+    customOptionIds.add(item.customization.sauceId);
 
-    customOptionIds.add(
-      item.customization.cheeseId,
-    );
+    customOptionIds.add(item.customization.cheeseId);
 
-    for (const vegetableId of item
-      .customization.vegetableIds) {
+    for (const vegetableId of item.customization.vegetableIds) {
       customOptionIds.add(vegetableId);
     }
   }
@@ -299,25 +226,24 @@ export async function createOrder({
       : [];
 
   const customOptionMap = new Map(
-    customOptions.map((option) => [
-      option.optionId,
-      option,
-    ]),
+    customOptions.map((option) => [option.optionId, option]),
   );
+  console.log("Requested custom option IDs:", [...customOptionIds]);
 
+  console.log("Found custom option IDs:", [...customOptionMap.keys()]);
   /* =========================
      VERIFY CUSTOM OPTIONS
   ========================== */
 
-  if (
-    customOptionMap.size !==
-    customOptionIds.size
-  ) {
+  const missingCustomOptionIds = [...customOptionIds].filter(
+    (optionId) => !customOptionMap.has(optionId),
+  );
+
+  if (missingCustomOptionIds.length > 0) {
     throw new Error(
-      "One or more custom pizza options are unavailable.",
+      `Custom pizza option(s) unavailable: ${missingCustomOptionIds.join(", ")}`,
     );
   }
-
   /* =========================
      CALCULATE ORDER ITEMS
   ========================== */
@@ -330,9 +256,7 @@ export async function createOrder({
     ========================== */
 
     if (item.type === "menu") {
-      const pizza = pizzaMap.get(
-        item.productId,
-      );
+      const pizza = pizzaMap.get(item.productId);
 
       const unitPrice = pizza.price;
 
@@ -342,8 +266,7 @@ export async function createOrder({
         name: pizza.name,
         quantity: item.quantity,
         unitPrice,
-        lineTotal:
-          unitPrice * item.quantity,
+        lineTotal: unitPrice * item.quantity,
       });
 
       continue;
@@ -353,50 +276,29 @@ export async function createOrder({
        CUSTOM PIZZA
     ========================== */
 
-    const {
-      baseId,
-      sauceId,
-      cheeseId,
-      vegetableIds,
-    } = item.customization;
+    const { baseId, sauceId, cheeseId, vegetableIds } = item.customization;
 
-    const base =
-      customOptionMap.get(baseId);
+    const base = customOptionMap.get(baseId);
 
-    const sauce =
-      customOptionMap.get(sauceId);
+    const sauce = customOptionMap.get(sauceId);
 
-    const cheese =
-      customOptionMap.get(cheeseId);
+    const cheese = customOptionMap.get(cheeseId);
 
     if (
       base.type !== "base" ||
       sauce.type !== "sauce" ||
       cheese.type !== "cheese"
     ) {
-      throw new Error(
-        "Invalid custom pizza option types.",
-      );
+      throw new Error("Invalid custom pizza option types.");
     }
 
-    let customPrice =
-      base.price +
-      sauce.price +
-      cheese.price;
+    let customPrice = base.price + sauce.price + cheese.price;
 
     for (const vegetableId of vegetableIds) {
-      const vegetable =
-        customOptionMap.get(
-          vegetableId,
-        );
+      const vegetable = customOptionMap.get(vegetableId);
 
-      if (
-        vegetable.type !==
-        "vegetable"
-      ) {
-        throw new Error(
-          `Invalid vegetable option "${vegetableId}".`,
-        );
+      if (vegetable.type !== "vegetable") {
+        throw new Error(`Invalid vegetable option "${vegetableId}".`);
       }
 
       customPrice += vegetable.price;
@@ -419,8 +321,7 @@ export async function createOrder({
 
       unitPrice: customPrice,
 
-      lineTotal:
-        customPrice * item.quantity,
+      lineTotal: customPrice * item.quantity,
     });
   }
 
@@ -429,8 +330,7 @@ export async function createOrder({
   ========================== */
 
   const subtotal = orderItems.reduce(
-    (total, item) =>
-      total + item.lineTotal,
+    (total, item) => total + item.lineTotal,
     0,
   );
 

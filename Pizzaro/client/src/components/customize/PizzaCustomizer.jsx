@@ -163,6 +163,8 @@ const vegetables = [
 
 const toOptionId = (value) =>
   value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^\w\s-]/g, "")
