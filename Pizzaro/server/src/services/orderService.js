@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Pizza from "../models/Pizza.js";
 import Order from "../models/Order.js";
 import CustomizationOption from "../models/CustomizationOption.js";
@@ -352,6 +353,30 @@ export async function createOrder({ items, customer }) {
 
     subtotal,
   });
+
+  return order;
+}
+
+export async function getOrderById(orderId) {
+  if (!orderId) {
+    const error = new Error("Order ID is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    const error = new Error("Invalid order ID.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const order = await Order.findById(orderId).lean();
+
+  if (!order) {
+    const error = new Error("Order not found.");
+    error.statusCode = 404;
+    throw error;
+  }
 
   return order;
 }

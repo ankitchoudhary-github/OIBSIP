@@ -1,4 +1,29 @@
-import { createOrder } from "../services/orderService.js";
+import { createOrder, getOrderById, } from "../services/orderService.js";
+
+export async function getOrderController(req, res) {
+  try {
+    const { orderId } = req.params;
+
+    const order = await getOrderById(orderId);
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error(
+      "Get order error:",
+      error.message,
+    );
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message:
+        error.message || "Failed to get order.",
+    });
+  }
+}
+
 
 export async function createOrderController(req, res) {
   try {
