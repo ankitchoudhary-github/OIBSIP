@@ -260,13 +260,13 @@ const Checkout = ({ onBack }) => {
               verifyData.order,
             );
 
-            setCompletedOrder(
-              verifyData.order,
+            setIsProcessingPayment(false);
+            clearCart();
+
+            navigate(
+              `/order-confirmation/${verifyData.order._id}`,
             );
 
-            setPaymentSuccess(true);
-
-            clearCart();
           } catch (error) {
             console.error(
               "Payment verification error:",

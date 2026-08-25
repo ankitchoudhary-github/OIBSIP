@@ -1,6 +1,8 @@
+import OrderConfirmation from "./pages/orderConfirmation/OrderConfirmation.jsx";
+
 import HowItWorks from "./components/landing/HowItWorks";
 import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import CartToast from "./components/ui/CartToast";
 import { useCart } from "./context/useCart";
@@ -70,7 +72,16 @@ function App() {
           path="/checkout"
           element={<Checkout />}
         />
+
+         <Route
+        path="/order-confirmation/:orderId"
+        element={<OrderConfirmation />}
+      />
+
       </Routes>
+
+     
+
     </main>
   );
 }
