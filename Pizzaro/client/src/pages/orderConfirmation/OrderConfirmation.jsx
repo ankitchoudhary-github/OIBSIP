@@ -245,7 +245,7 @@ const OrderConfirmation = () => {
                 </p>
               </div>
 
-             <div className="my-4 border-t border-dashed border-black/15" />
+              <div className="my-4 border-t border-dashed border-black/15" />
 
               {/* Order information */}
               <div className="space-y-2 text-[10px]">
@@ -280,80 +280,35 @@ const OrderConfirmation = () => {
 
               <div className="my-6 border-t border-dashed border-black/15" />
 
-              {/* Items */}
-              <div className="space-y-3">
-                {order.items.map(
-                  (item, index) => (
-                    <div
-                      key={`${item.name}-${index}`}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-bold">
-                            {item.name}
-                          </p>
-
-                          <p className="mt-1 text-[9px] text-black/50">
-                            Qty {item.quantity} × ₹
-                            {item.unitPrice}
-                          </p>
-                        </div>
-
-                        <p className="shrink-0 text-[11px] font-bold">
-                          ₹{item.lineTotal}
+              {/* Items List (Scrollable Container) */}
+              {/* Items List (Scrollable Container aligned to right edge) */}
+              <div className="max-h-44 overflow-y-auto pr-2 scrollbar-gutter:stable [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-black/5 [&::-webkit-scrollbar-thumb]:bg-black/25 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-black/40">
+                {order.items.map((item, index) => (
+                  <div key={`${item.name}-${index}`} className="mb-3 last:mb-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold">{item.name}</p>
+                        <p className="mt-1 text-[9px] text-black/50">
+                          Qty {item.quantity} × ₹{item.unitPrice}
                         </p>
                       </div>
-
-                      {/* Custom pizza details */}
-                      {item.type === "custom" &&
-                        item.customization && (
-                          <div className="mt-2 text-[8px] leading-4 text-black/55">
-                            <p>
-                              Base:{" "}
-                              {
-                                item
-                                  .customization
-                                  .baseId
-                              }
-                            </p>
-
-                            <p>
-                              Sauce:{" "}
-                              {
-                                item
-                                  .customization
-                                  .sauceId
-                              }
-                            </p>
-
-                            <p>
-                              Cheese:{" "}
-                              {
-                                item
-                                  .customization
-                                  .cheeseId
-                              }
-                            </p>
-
-                            {item.customization
-                              .vegetableIds
-                              ?.length >
-                              0 && (
-                                <p>
-                                  Veg:{" "}
-                                  {item.customization.vegetableIds.join(
-                                    " · ",
-                                  )}
-                                </p>
-                              )}
-                          </div>
-                        )}
+                      <p className="shrink-0 text-[11px] font-bold">₹{item.lineTotal}</p>
                     </div>
-                  ),
-                )}
-              </div>
 
-             <div className="my-4 border-t border-dashed border-black/15" />
+                    {item.type === "custom" && item.customization && (
+                      <div className="mt-2 text-[8px] leading-4 text-black/55">
+                        <p>Base: {item.customization.baseId}</p>
+                        <p>Sauce: {item.customization.sauceId}</p>
+                        <p>Cheese: {item.customization.cheeseId}</p>
+                        {item.customization.vegetableIds?.length > 0 && (
+                          <p>Veg: {item.customization.vegetableIds.join(" · ")}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="my-4 border-t border-dashed border-black/15" />
 
               {/* Total */}
               <div className="flex items-center justify-between text-xs font-black">
@@ -363,7 +318,8 @@ const OrderConfirmation = () => {
                   ₹{order.subtotal}
                 </span>
               </div>
-<div className="mt-4 border-t border-dashed border-black/15 pt-4 text-center">
+
+              <div className="mt-4 border-t border-dashed border-black/15 pt-4 text-center">
                 <p className="text-[9px] uppercase tracking-[2px] text-black/45">
                   Thank you for ordering
                 </p>
