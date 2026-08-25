@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -12,8 +13,7 @@ const CART_STORAGE_KEY = "pizzaro-cart";
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
     try {
-      const savedCart =
-        localStorage.getItem(CART_STORAGE_KEY);
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
 
       if (!savedCart) {
         return [];
@@ -21,21 +21,14 @@ export function CartProvider({ children }) {
 
       const parsedCart = JSON.parse(savedCart);
 
-      return Array.isArray(parsedCart)
-        ? parsedCart
-        : [];
+      return Array.isArray(parsedCart) ? parsedCart : [];
     } catch (error) {
-      console.error(
-        "Failed to load cart from localStorage:",
-        error,
-      );
-
+      console.error("Failed to load cart from localStorage:", error);
       return [];
     }
   });
 
-  const [lastAddedItem, setLastAddedItem] =
-    useState(null);
+  const [lastAddedItem, setLastAddedItem] = useState(null);
 
   /* Save cart whenever it changes */
   useEffect(() => {
@@ -45,15 +38,12 @@ export function CartProvider({ children }) {
         JSON.stringify(cartItems),
       );
     } catch (error) {
-      console.error(
-        "Failed to save cart to localStorage:",
-        error,
-      );
+      console.error("Failed to save cart to localStorage:", error);
     }
   }, [cartItems]);
 
   /* Add to cart */
-  const addToCart = (item) => {
+  const addToCart = useCallback((item) => {
     setCartItems((currentItems) => {
       const existingItem = currentItems.find(
         (cartItem) => cartItem.id === item.id,
@@ -64,9 +54,7 @@ export function CartProvider({ children }) {
           cartItem.id === item.id
             ? {
                 ...cartItem,
-                quantity:
-                  cartItem.quantity +
-                  (item.quantity ?? 1),
+                quantity: cartItem.quantity + (item.quantity ?? 1),
               }
             : cartItem,
         );
@@ -82,26 +70,26 @@ export function CartProvider({ children }) {
     });
 
     setLastAddedItem(item);
-  };
+  }, []);
 
   /* Clear toast item */
-  const clearLastAddedItem = () => {
+  const clearLastAddedItem = useCallback(() => {
     setLastAddedItem(null);
-  };
+  }, []);
 
   /* Remove item */
-  const removeFromCart = (id) => {
+  const removeFromCart = useCallback((id) => {
     setCartItems((currentItems) =>
-      currentItems.filter(
-        (item) => item.id !== id,
-      ),
+      currentItems.filter((item) => item.id !== id),
     );
-  };
+  }, []);
 
   /* Update quantity */
-  const updateQuantity = (id, quantity) => {
+  const updateQuantity = useCallback((id, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(id);
+      setCartItems((currentItems) =>
+        currentItems.filter((item) => item.id !== id),
+      );
       return;
     }
 
@@ -115,18 +103,17 @@ export function CartProvider({ children }) {
           : item,
       ),
     );
-  };
+  }, []);
 
   /* Clear cart */
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
   /* Total item count */
   const totalItems = useMemo(() => {
     return cartItems.reduce(
-      (total, item) =>
-        total + (item.quantity ?? 0),
+      (total, item) => total + (item.quantity ?? 0),
       0,
     );
   }, [cartItems]);
@@ -135,27 +122,39 @@ export function CartProvider({ children }) {
   const subtotal = useMemo(() => {
     return cartItems.reduce(
       (total, item) =>
-        total +
-        (item.price ?? 0) *
-          (item.quantity ?? 0),
+        total + (item.price ?? 0) * (item.quantity ?? 0),
       0,
     );
   }, [cartItems]);
 
+  /* Memoize context value to optimize re-renders */
+  const contextValue = useMemo(
+    () => ({
+      cartItems,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      totalItems,
+      subtotal,
+      lastAddedItem,
+      clearLastAddedItem,
+    }),
+    [
+      cartItems,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      totalItems,
+      subtotal,
+      lastAddedItem,
+      clearLastAddedItem,
+    ],
+  );
+
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        subtotal,
-        lastAddedItem,
-        clearLastAddedItem,
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

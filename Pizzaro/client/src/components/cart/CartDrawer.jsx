@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -19,16 +20,32 @@ const CartDrawer = ({ isOpen, onClose }) => {
     removeFromCart,
     updateQuantity,
     subtotal,
+    totalItems,
   } = useCart();
 
-  const totalItems = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
+  // Disable background scroll & support Escape key to close drawer
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const handleCheckout = () => {
     onClose();
     navigate("/checkout");
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -42,7 +59,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 z-90 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 z-100 bg-black/30 backdrop-blur-sm"
           />
 
           {/* Drawer */}
@@ -55,7 +72,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               stiffness: 320,
               damping: 32,
             }}
-            className="fixed right-0 top-0 z-100 flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
+            className="fixed right-0 top-0 z-110 flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-black/5 px-6 py-5">
@@ -115,8 +132,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   </h3>
 
                   <p className="mt-2 max-w-xs text-sm leading-6 text-pizzaro-muted">
-                    Add something delicious from the menu or
-                    build your own pizza.
+                    Add something delicious from the menu or build your own
+                    pizza.
                   </p>
 
                   <button
@@ -180,9 +197,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
                               <button
                                 type="button"
-                                onClick={() =>
-                                  removeFromCart(item.id)
-                                }
+                                onClick={() => removeFromCart(item.id)}
                                 className="shrink-0 text-pizzaro-muted transition hover:text-red-500"
                                 aria-label={`Remove ${item.name}`}
                               >
@@ -226,12 +241,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             )}
 
                             {/* Menu description */}
-                            {item.type === "menu" &&
-                              item.description && (
-                                <p className="mt-2 text-xs leading-5 text-pizzaro-muted">
-                                  {item.description}
-                                </p>
-                              )}
+                            {item.type === "menu" && item.description && (
+                              <p className="mt-2 text-xs leading-5 text-pizzaro-muted">
+                                {item.description}
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -241,10 +255,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             <button
                               type="button"
                               onClick={() =>
-                                updateQuantity(
-                                  item.id,
-                                  item.quantity - 1,
-                                )
+                                updateQuantity(item.id, item.quantity - 1)
                               }
                               className="flex h-9 w-9 items-center justify-center text-pizzaro-dark transition hover:text-pizzaro-red"
                               aria-label="Decrease quantity"
@@ -270,10 +281,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             <button
                               type="button"
                               onClick={() =>
-                                updateQuantity(
-                                  item.id,
-                                  item.quantity + 1,
-                                )
+                                updateQuantity(item.id, item.quantity + 1)
                               }
                               className="flex h-9 w-9 items-center justify-center text-pizzaro-dark transition hover:text-pizzaro-red"
                               aria-label="Increase quantity"
@@ -309,9 +317,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               <div className="border-t border-black/5 bg-white px-6 py-5">
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-pizzaro-muted">
-                      Subtotal
-                    </span>
+                    <span className="text-pizzaro-muted">Subtotal</span>
 
                     <span className="font-semibold text-pizzaro-dark">
                       ₹{subtotal}
@@ -319,9 +325,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-pizzaro-muted">
-                      Delivery
-                    </span>
+                    <span className="text-pizzaro-muted">Delivery</span>
 
                     <span className="font-semibold text-pizzaro-green">
                       Free
@@ -332,9 +336,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
                   <div className="flex items-end justify-between gap-4">
                     <div>
-                      <p className="text-sm text-pizzaro-muted">
-                        Total
-                      </p>
+                      <p className="text-sm text-pizzaro-muted">Total</p>
 
                       <motion.p
                         key={subtotal}
