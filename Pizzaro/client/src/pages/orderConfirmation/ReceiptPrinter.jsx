@@ -1,63 +1,38 @@
 import {
-
   CheckCircle,
-
   CircleNotch,
-
 } from "@phosphor-icons/react";
 
 import {
-
   AnimatePresence,
-
   motion,
-
   useReducedMotion,
-
 } from "motion/react";
 
 import {
-
   createContext,
-
   useContext,
-
 } from "react";
 
 const ReceiptPrinterContext = createContext(null);
-
 const easeOut = [0.23, 1, 0.32, 1];
-
 const easeInOut = [0.77, 0, 0.175, 1];
-
 const receiptToothCount = 40;
-
 const receiptToothDepth = 4;
-
 const receiptToothPoints = Array.from(
 
   { length: receiptToothCount * 2 },
-
   (_, index) => {
-
     const x =
-
       100 -
-
       ((index + 1) * 100) /
-
       (receiptToothCount * 2);
-
     const y =
-
       index % 2 === 0
-
         ? "100%"
-
         : `calc(100% - ${receiptToothDepth}px)`;
 
     return `${x}% ${y}`;
-
   },
 
 ).join(", ");
@@ -240,7 +215,7 @@ function ReceiptPrinterRoot({
 
         aria-label="Order receipt"
 
-        className={`relative flex w-full flex-col items-center ${className}`}
+       className={`relative mx-auto flex w-full max-w-sm flex-col items-center ${className}`}
 
         data-stage={stage}
 
@@ -308,7 +283,7 @@ function ReceiptPrinterHeader({
 
     <div
 
-      className={`relative z-10 flex h-11 items-start justify-between ${className}`}
+      className={`relative z-10 flex h-11 items-center justify-between ${className}`}
 
       {...props}
 
@@ -634,7 +609,7 @@ function ReceiptPrinterPaper({
 
     <article
 
-      className={`relative z-10 min-h-80 bg-[#fffdf9] px-6 pt-7 pb-8 font-mono text-[#171717] ${className}`}
+      className={`relative z-10 min-h-0 bg-[#fffdf9] px-6 pt-7 pb-6 font-mono text-[#171717] ${className}`}
 
       style={{
 
@@ -698,7 +673,7 @@ function ReceiptPrinterOutput({
 
     <div
 
-      className={`relative z-50 -mt-4 h-152 w-[calc(80%+3rem)] max-w-full overflow-hidden px-6 ${className}`}
+      className={`relative z-50 -mt-4 h-128 w-[calc(80%+3rem)] max-w-full overflow-hidden px-6 ${className}`}
 
       {...props}
 

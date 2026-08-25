@@ -174,6 +174,7 @@ const OrderConfirmation = () => {
                 depth="shallow"
                 href="/"
                 size="sm"
+                mr-1
               >
                 <House
                   aria-hidden="true"
@@ -244,7 +245,7 @@ const OrderConfirmation = () => {
                 </p>
               </div>
 
-              <div className="my-6 border-t border-dashed border-black/15" />
+             <div className="my-4 border-t border-dashed border-black/15" />
 
               {/* Order information */}
               <div className="space-y-2 text-[10px]">
@@ -280,7 +281,7 @@ const OrderConfirmation = () => {
               <div className="my-6 border-t border-dashed border-black/15" />
 
               {/* Items */}
-              <div className="space-y-5">
+              <div className="space-y-3">
                 {order.items.map(
                   (item, index) => (
                     <div
@@ -352,7 +353,7 @@ const OrderConfirmation = () => {
                 )}
               </div>
 
-              <div className="my-6 border-t border-dashed border-black/15" />
+             <div className="my-4 border-t border-dashed border-black/15" />
 
               {/* Total */}
               <div className="flex items-center justify-between text-xs font-black">
@@ -362,8 +363,7 @@ const OrderConfirmation = () => {
                   ₹{order.subtotal}
                 </span>
               </div>
-
-              <div className="mt-6 border-t border-dashed border-black/15 pt-5 text-center">
+<div className="mt-4 border-t border-dashed border-black/15 pt-4 text-center">
                 <p className="text-[9px] uppercase tracking-[2px] text-black/45">
                   Thank you for ordering
                 </p>
