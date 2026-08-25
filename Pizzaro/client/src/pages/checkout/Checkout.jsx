@@ -9,6 +9,7 @@ const Checkout = ({ onBack }) => {
     cartItems,
     subtotal,
     orderSuggestions,
+    clearCart,
   } = useCart();
 
   const [form, setForm] = useState({
@@ -22,6 +23,15 @@ const Checkout = ({ onBack }) => {
 
   const [error, setError] = useState("");
 
+  const [paymentSuccess, setPaymentSuccess] =
+    useState(false);
+
+  const [completedOrder, setCompletedOrder] =
+    useState(null);
+
+  const [isProcessingPayment, setIsProcessingPayment] =
+    useState(false);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -34,6 +44,11 @@ const Checkout = ({ onBack }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (isProcessingPayment) {
+      return;
+    }
+
+    setIsProcessingPayment(true);
     const {
       name,
       phone,
@@ -245,8 +260,13 @@ const Checkout = ({ onBack }) => {
               verifyData.order,
             );
 
-            // We'll improve this UI after verification works.
-            alert("Payment successful!");
+            setCompletedOrder(
+              verifyData.order,
+            );
+
+            setPaymentSuccess(true);
+
+            clearCart();
           } catch (error) {
             console.error(
               "Payment verification error:",
@@ -260,12 +280,14 @@ const Checkout = ({ onBack }) => {
           }
         },
 
-        
+
         modal: {
           ondismiss: function () {
             console.log(
               "Razorpay Checkout closed.",
             );
+
+            setIsProcessingPayment(false);
           },
         },
       };
@@ -284,8 +306,68 @@ const Checkout = ({ onBack }) => {
         error.message ||
         "Something went wrong during checkout.",
       );
+
+      setIsProcessingPayment(false);
     }
   };
+
+
+  if (paymentSuccess) {
+    return (
+      <main className="min-h-screen bg-pizzaro-cream px-6 pb-24 pt-32">
+        <div className="mx-auto max-w-2xl">
+          <div className="rounded-4xl bg-white px-6 py-16 text-center shadow-pizzaro">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
+              ✓
+            </div>
+
+            <p className="mt-6 text-sm font-bold uppercase tracking-[4px] text-pizzaro-red">
+              ORDER CONFIRMED
+            </p>
+
+            <h1 className="mt-3 font-display text-4xl font-bold text-pizzaro-dark md:text-5xl">
+              Pizza is on the way.
+            </h1>
+
+            <p className="mx-auto mt-4 max-w-lg text-lg leading-8 text-pizzaro-muted">
+              Your payment was successful and your order
+              has been confirmed.
+            </p>
+
+            {completedOrder?._id && (
+              <div className="mt-6 rounded-2xl bg-pizzaro-cream px-5 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[2px] text-pizzaro-muted">
+                  Order ID
+                </p>
+
+                <p className="mt-2 break-all font-mono text-sm font-semibold text-pizzaro-dark">
+                  {completedOrder._id}
+                </p>
+              </div>
+            )}
+
+            {completedOrder?.subtotal != null && (
+              <p className="mt-6 text-lg font-semibold text-pizzaro-dark">
+                Total paid: ₹{completedOrder.subtotal}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="mt-8 rounded-full bg-pizzaro-dark px-7 py-4 text-sm font-semibold text-white transition hover:bg-pizzaro-red"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+
+
+
 
   return (
     <main className="min-h-screen bg-pizzaro-cream px-6 pb-20 pt-32">
@@ -463,12 +545,17 @@ const Checkout = ({ onBack }) => {
                 </div>
               )}
 
+
               <button
                 type="submit"
-                className="w-full rounded-full bg-pizzaro-dark px-6 py-4 text-sm font-semibold text-white transition hover:bg-pizzaro-red"
+                disabled={isProcessingPayment}
+                className="w-full rounded-full bg-pizzaro-dark px-6 py-4 text-sm font-semibold text-white transition hover:bg-pizzaro-red disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Continue to Payment
+                {isProcessingPayment
+                  ? "Processing Payment..."
+                  : "Continue to Payment"}
               </button>
+
             </form>
           </section>
 
