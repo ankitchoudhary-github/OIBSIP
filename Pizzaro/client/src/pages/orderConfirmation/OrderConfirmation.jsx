@@ -1,5 +1,8 @@
+import { House } from "@phosphor-icons/react";
+import TactileButton from "../../components/ui/TactileButton";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ReceiptPrinter } from "./ReceiptPrinter";
 
 const OrderConfirmation = () => {
   const { orderId } = useParams();
@@ -8,8 +11,15 @@ const OrderConfirmation = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [stage, setStage] = useState("processing");
+
+  /* =========================
+     FETCH ORDER
+  ========================== */
 
   useEffect(() => {
+    let mounted = true;
+
     async function fetchOrder() {
       try {
         const response = await fetch(
@@ -24,21 +34,74 @@ const OrderConfirmation = () => {
           );
         }
 
+        if (!mounted) {
+          return;
+        }
+
         setOrder(data.order);
+
+        // Order has been loaded.
+        // Start receipt printing.
+        setStage("printing");
       } catch (error) {
-        console.error("Order fetch error:", error);
+        if (!mounted) {
+          return;
+        }
+
+        console.error(
+          "Order fetch error:",
+          error,
+        );
 
         setError(
           error.message ||
-            "Unable to load your order.",
+          "Unable to load your order.",
         );
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchOrder();
+
+    return () => {
+      mounted = false;
+    };
   }, [orderId]);
+
+  /* =========================
+     RECEIPT ANIMATION
+  ========================== */
+
+  useEffect(() => {
+    if (!order) {
+      return;
+    }
+
+    const printingTimer = setTimeout(() => {
+      setStage("printing");
+    }, 1000);
+
+    return () => clearTimeout(printingTimer);
+  }, [order]);
+
+  useEffect(() => {
+    if (stage !== "printing") {
+      return;
+    }
+
+    const completeTimer = setTimeout(() => {
+      setStage("complete");
+    }, 3600);
+
+    return () => clearTimeout(completeTimer);
+  }, [stage]);
+
+  /* =========================
+     LOADING
+  ========================== */
 
   if (loading) {
     return (
@@ -51,6 +114,10 @@ const OrderConfirmation = () => {
       </main>
     );
   }
+
+  /* =========================
+     ERROR
+  ========================== */
 
   if (error || !order) {
     return (
@@ -81,151 +148,233 @@ const OrderConfirmation = () => {
     );
   }
 
+  /* =========================
+     ORDER CONFIRMATION
+  ========================== */
+
   return (
     <main className="min-h-screen bg-pizzaro-cream px-6 pb-24 pt-32">
-      <div className="mx-auto max-w-3xl">
-        <section className="rounded-4xl bg-white px-6 py-12 shadow-pizzaro sm:px-10 sm:py-16">
-          <div className="text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
-              ✓
-            </div>
+      <div className="mx-auto flex max-w-2xl justify-center">
+        <ReceiptPrinter.Root
+          stage={stage}
+          feedMotion="stepped"
+          className="w-full"
+        >
+          {/* =========================
+              PRINTER
+          ========================== */}
 
-            <p className="mt-6 text-sm font-bold uppercase tracking-[4px] text-pizzaro-red">
-              ORDER CONFIRMED
-            </p>
+          <ReceiptPrinter.Machine>
+            <ReceiptPrinter.Header className="items-center">
+              <div className="ml-2 flex h-full items-center font-display text-sm font-bold leading-none tracking-tight text-white">
+                Pizzaro<span className="text-white">.</span>
+              </div>
 
-            <h1 className="mt-3 font-display text-4xl font-bold text-pizzaro-dark md:text-5xl">
-              Pizza is on the way.
-            </h1>
+              <TactileButton
+                depth="shallow"
+                href="/"
+                size="sm"
+              >
+                <House
+                  aria-hidden="true"
+                  size={13}
+                  weight="fill"
+                />
+                Home
+              </TactileButton>
+            </ReceiptPrinter.Header>
 
-            <p className="mx-auto mt-4 max-w-xl text-lg leading-8 text-pizzaro-muted">
-              Your payment has been verified and your
-              order is confirmed.
-            </p>
-          </div>
+            {/* =========================
+                SCREEN
+            ========================== */}
 
-          {/* Order details */}
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl bg-pizzaro-cream px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[2px] text-pizzaro-muted">
-                Order ID
-              </p>
-
-              <p className="mt-2 break-all font-mono text-sm font-semibold text-pizzaro-dark">
-                {order._id}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-pizzaro-cream px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[2px] text-pizzaro-muted">
-                Payment
-              </p>
-
-              <p className="mt-2 text-sm font-bold capitalize text-green-600">
-                {order.payment?.status || "pending"}
-              </p>
-            </div>
-          </div>
-
-          {/* Items */}
-          <div className="mt-10">
-            <h2 className="font-display text-2xl font-bold text-pizzaro-dark">
-              Your order
-            </h2>
-
-            <div className="mt-5 space-y-3">
-              {order.items.map((item, index) => (
-                <div
-                  key={`${item.productId || item.name}-${index}`}
-                  className="flex items-start justify-between gap-4 rounded-2xl bg-pizzaro-cream p-4"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-pizzaro-dark">
-                      {item.name}
+            <ReceiptPrinter.Screen>
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold">
+                      Pizzaro Order
                     </p>
 
-                    <p className="mt-1 text-sm text-pizzaro-muted">
-                      Qty: {item.quantity}
-                    </p>
+                    <p className="mt-1 text-xs text-white/50">
+                      {stage === "processing" &&
+                        "Processing payment"}
 
-                    {item.type === "custom" &&
-                      item.customization && (
-                        <div className="mt-2 text-xs leading-5 text-pizzaro-muted">
-                          <p>
-                            Base:{" "}
-                            {item.customization.baseId}
-                          </p>
+                      {stage === "printing" &&
+                        "Payment confirmed"}
 
-                          <p>
-                            Sauce:{" "}
-                            {item.customization.sauceId}
-                          </p>
-
-                          <p>
-                            Cheese:{" "}
-                            {item.customization.cheeseId}
-                          </p>
-
-                          {item.customization
-                            .vegetableIds
-                            ?.length > 0 && (
-                            <p>
-                              Vegetables:{" "}
-                              {item.customization.vegetableIds.join(
-                                " · ",
-                              )}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <p className="font-semibold text-pizzaro-dark">
-                      ₹{item.lineTotal}
-                    </p>
-
-                    <p className="mt-1 text-xs text-pizzaro-muted">
-                      ₹{item.unitPrice} each
+                      {stage === "complete" &&
+                        "Your receipt is ready"}
                     </p>
                   </div>
+
+                  <strong className="text-sm">
+                    ₹{order.subtotal}
+                  </strong>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Total */}
-          <div className="mt-8 border-t border-black/5 pt-6">
-            <div className="flex items-end justify-between">
-              <span className="text-sm text-pizzaro-muted">
-                Total paid
-              </span>
+                <ReceiptPrinter.Status>
+                  {stage === "processing" &&
+                    "Processing your order"}
 
-              <span className="font-display text-3xl font-bold text-pizzaro-dark">
-                ₹{order.subtotal}
-              </span>
-            </div>
-          </div>
+                  {stage === "printing" &&
+                    "Printing your receipt"}
 
-          {/* Actions */}
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="rounded-full bg-pizzaro-dark px-7 py-4 text-sm font-semibold text-white transition hover:bg-pizzaro-red"
-            >
-              Back to Home
-            </button>
+                  {stage === "complete" &&
+                    "Order complete"}
+                </ReceiptPrinter.Status>
+              </div>
+            </ReceiptPrinter.Screen>
+          </ReceiptPrinter.Machine>
 
-            <button
-              type="button"
-              onClick={() => navigate("/menu")}
-              className="rounded-full border border-gray-200 px-7 py-4 text-sm font-semibold text-pizzaro-dark transition hover:border-pizzaro-red hover:text-pizzaro-red"
-            >
-              View Menu
-            </button>
-          </div>
-        </section>
+          {/* =========================
+              RECEIPT OUTPUT
+          ========================== */}
+
+          <ReceiptPrinter.Output>
+            <ReceiptPrinter.Paper>
+              {/* Header */}
+              <div className="text-center">
+                <p className="font-display text-2xl font-bold tracking-tight text-black">
+                  Pizzaro<span className="text-black">.</span>
+                </p>
+
+                <p className="mt-1 text-[9px] uppercase tracking-[2px] text-black/50">
+                  Pizza Delivered Your Way
+                </p>
+              </div>
+
+              <div className="my-6 border-t border-dashed border-black/15" />
+
+              {/* Order information */}
+              <div className="space-y-2 text-[10px]">
+                <div className="flex justify-between gap-4">
+                  <span>ORDER</span>
+
+                  <span className="font-bold">
+                    {order._id
+                      .slice(-8)
+                      .toUpperCase()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-4">
+                  <span>PAYMENT</span>
+
+                  <span className="font-bold uppercase">
+                    {order.payment?.status ||
+                      "pending"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-4">
+                  <span>METHOD</span>
+
+                  <span className="font-bold uppercase">
+                    {order.payment?.provider ||
+                      "razorpay"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="my-6 border-t border-dashed border-black/15" />
+
+              {/* Items */}
+              <div className="space-y-5">
+                {order.items.map(
+                  (item, index) => (
+                    <div
+                      key={`${item.name}-${index}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-bold">
+                            {item.name}
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-black/50">
+                            Qty {item.quantity} × ₹
+                            {item.unitPrice}
+                          </p>
+                        </div>
+
+                        <p className="shrink-0 text-[11px] font-bold">
+                          ₹{item.lineTotal}
+                        </p>
+                      </div>
+
+                      {/* Custom pizza details */}
+                      {item.type === "custom" &&
+                        item.customization && (
+                          <div className="mt-2 text-[8px] leading-4 text-black/55">
+                            <p>
+                              Base:{" "}
+                              {
+                                item
+                                  .customization
+                                  .baseId
+                              }
+                            </p>
+
+                            <p>
+                              Sauce:{" "}
+                              {
+                                item
+                                  .customization
+                                  .sauceId
+                              }
+                            </p>
+
+                            <p>
+                              Cheese:{" "}
+                              {
+                                item
+                                  .customization
+                                  .cheeseId
+                              }
+                            </p>
+
+                            {item.customization
+                              .vegetableIds
+                              ?.length >
+                              0 && (
+                                <p>
+                                  Veg:{" "}
+                                  {item.customization.vegetableIds.join(
+                                    " · ",
+                                  )}
+                                </p>
+                              )}
+                          </div>
+                        )}
+                    </div>
+                  ),
+                )}
+              </div>
+
+              <div className="my-6 border-t border-dashed border-black/15" />
+
+              {/* Total */}
+              <div className="flex items-center justify-between text-xs font-black">
+                <span>TOTAL PAID</span>
+
+                <span>
+                  ₹{order.subtotal}
+                </span>
+              </div>
+
+              <div className="mt-6 border-t border-dashed border-black/15 pt-5 text-center">
+                <p className="text-[9px] uppercase tracking-[2px] text-black/45">
+                  Thank you for ordering
+                </p>
+
+                <p className="mt-1 text-[9px] uppercase tracking-[2px] text-black/45">
+                  with Pizzaro
+                </p>
+              </div>
+            </ReceiptPrinter.Paper>
+          </ReceiptPrinter.Output>
+        </ReceiptPrinter.Root>
       </div>
     </main>
   );
