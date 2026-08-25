@@ -3,17 +3,9 @@ import crypto from "node:crypto";
 import razorpay from "../config/razorpay.js";
 import Order from "../models/Order.js";
 
-export async function createRazorpayOrder({
-  amount,
-  receipt,
-}) {
-  if (
-    !Number.isInteger(amount) ||
-    amount <= 0
-  ) {
-    throw new Error(
-      "Payment amount must be a positive integer.",
-    );
+export async function createRazorpayOrder({ amount, receipt }) {
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error("Payment amount must be a positive integer.");
   }
 
   const options = {
@@ -22,8 +14,7 @@ export async function createRazorpayOrder({
     receipt,
   };
 
-  const razorpayOrder =
-    await razorpay.orders.create(options);
+  const razorpayOrder = await razorpay.orders.create(options);
 
   return razorpayOrder;
 }
@@ -39,26 +30,18 @@ export async function verifyRazorpayPayment({
   }
 
   if (!razorpayPaymentId) {
-    throw new Error(
-      "Razorpay payment ID is required.",
-    );
+    throw new Error("Razorpay payment ID is required.");
   }
 
   if (!razorpayOrderId) {
-    throw new Error(
-      "Razorpay order ID is required.",
-    );
+    throw new Error("Razorpay order ID is required.");
   }
 
   if (!razorpaySignature) {
-    throw new Error(
-      "Razorpay signature is required.",
-    );
+    throw new Error("Razorpay signature is required.");
   }
 
-  const order = await Order.findById(
-    mongoOrderId,
-  );
+  const order = await Order.findById(mongoOrderId);
 
   if (!order) {
     throw new Error("Order not found.");
@@ -81,68 +64,41 @@ export async function verifyRazorpayPayment({
     Do not use the browser-supplied order ID as the
     source of truth for the signature calculation.
   */
-  const storedRazorpayOrderId =
-    order.payment.razorpayOrderId;
+  const storedRazorpayOrderId = order.payment.razorpayOrderId;
 
   if (!storedRazorpayOrderId) {
-    throw new Error(
-      "No Razorpay order is associated with this order.",
-    );
+    throw new Error("No Razorpay order is associated with this order.");
   }
 
-  if (
-    storedRazorpayOrderId !==
-    razorpayOrderId
-  ) {
-    throw new Error(
-      "Razorpay order ID does not match our order.",
-    );
+  if (storedRazorpayOrderId !== razorpayOrderId) {
+    throw new Error("Razorpay order ID does not match our order.");
   }
 
-  const body =
-    `${storedRazorpayOrderId}|` +
-    razorpayPaymentId;
+  const body = `${storedRazorpayOrderId}|` + razorpayPaymentId;
 
-  const expectedSignature =
-    crypto
-      .createHmac(
-        "sha256",
-        process.env.RAZORPAY_KEY_SECRET,
-      )
-      .update(body)
-      .digest("hex");
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(body)
+    .digest("hex");
 
   /*
     Use a timing-safe comparison instead of ===.
   */
-  const expectedBuffer =
-    Buffer.from(expectedSignature, "hex");
+  const expectedBuffer = Buffer.from(expectedSignature, "hex");
 
-  const receivedBuffer =
-    Buffer.from(
-      razorpaySignature,
-      "hex",
-    );
+  const receivedBuffer = Buffer.from(razorpaySignature, "hex");
 
-  if (
-    expectedBuffer.length !==
-    receivedBuffer.length
-  ) {
-    throw new Error(
-      "Invalid Razorpay signature.",
-    );
+  if (expectedBuffer.length !== receivedBuffer.length) {
+    throw new Error("Invalid Razorpay signature.");
   }
 
-  const isSignatureValid =
-    crypto.timingSafeEqual(
-      expectedBuffer,
-      receivedBuffer,
-    );
+  const isSignatureValid = crypto.timingSafeEqual(
+    expectedBuffer,
+    receivedBuffer,
+  );
 
   if (!isSignatureValid) {
-    throw new Error(
-      "Invalid Razorpay signature.",
-    );
+    throw new Error("Invalid Razorpay signature.");
   }
 
   /*
@@ -155,10 +111,8 @@ export async function verifyRazorpayPayment({
       $set: {
         "payment.status": "paid",
         "payment.provider": "razorpay",
-        "payment.razorpayOrderId":
-          storedRazorpayOrderId,
-        "payment.paymentId":
-          razorpayPaymentId,
+        "payment.razorpayOrderId": storedRazorpayOrderId,
+        "payment.paymentId": razorpayPaymentId,
         status: "confirmed",
       },
 
@@ -168,8 +122,7 @@ export async function verifyRazorpayPayment({
     },
   );
 
-  const updatedOrder =
-    await Order.findById(order._id);
+  const updatedOrder = await Order.findById(order._id);
 
   return {
     order: updatedOrder,
@@ -177,9 +130,7 @@ export async function verifyRazorpayPayment({
   };
 }
 
-export async function createPaymentForOrder(
-  orderId,
-) {
+export async function createPaymentForOrder(orderId) {
   if (!orderId) {
     throw new Error("Order ID is required.");
   }
@@ -191,17 +142,24 @@ export async function createPaymentForOrder(
   }
 
   if (order.payment.status === "paid") {
-    throw new Error(
-      "This order has already been paid.",
-    );
+    throw new Error("This order has already been paid.");
   }
 
   if (order.status === "cancelled") {
-    throw new Error(
-      "Cancelled orders cannot be paid.",
-    );
+    throw new Error("Cancelled orders cannot be paid.");
   }
 
+  if (order.payment?.razorpayOrderId && order.payment.status === "pending") {
+    return {
+      order,
+      razorpayOrder: {
+        id: order.payment.razorpayOrderId,
+        amount: order.subtotal * 100,
+        currency: "INR",
+      },
+      reused: true,
+    };
+  }
   /*
     IMPORTANT:
     The amount comes from our database order.
@@ -209,27 +167,25 @@ export async function createPaymentForOrder(
   */
   const amount = order.subtotal;
 
-  const razorpayOrder =
-    await createRazorpayOrder({
-      amount,
-      receipt: order._id.toString(),
-    });
+  const razorpayOrder = await createRazorpayOrder({
+    amount,
+    receipt: order._id.toString(),
+  });
 
   await Order.updateOne(
-  { _id: order._id },
-  {
-    $set: {
-      "payment.provider": "razorpay",
-      "payment.razorpayOrderId":
-        razorpayOrder.id,
-      "payment.status": "pending",
-    },
+    { _id: order._id },
+    {
+      $set: {
+        "payment.provider": "razorpay",
+        "payment.razorpayOrderId": razorpayOrder.id,
+        "payment.status": "pending",
+      },
 
-    $unset: {
-      "payment.orderId": "",
+      $unset: {
+        "payment.orderId": "",
+      },
     },
-  },
-);
+  );
 
   return {
     order,

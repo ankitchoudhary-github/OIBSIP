@@ -15,14 +15,11 @@ export async function createPaymentController(req, res) {
 
       payment: {
         keyId: process.env.RAZORPAY_KEY_ID,
-
         orderId: result.razorpayOrder.id,
-
         amount: result.razorpayOrder.amount,
-
         currency: result.razorpayOrder.currency,
-
         mongoOrderId: result.order._id,
+        reused: result.reused ?? false,
       },
     });
   } catch (error) {
