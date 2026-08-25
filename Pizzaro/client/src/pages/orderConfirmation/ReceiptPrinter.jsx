@@ -374,7 +374,7 @@ function ReceiptPrinterOutput({
 
   return (
     <div
-      className={`relative z-50 -mt-4 h-auto max-h-[70vh] w-[calc(80%+3rem)] max-w-full overflow-hidden px-6 ${className}`}
+      className={`relative z-50 -mt-4 h-auto max-h-[70vh] w-[calc(80%+3rem)] max-w-full overflow-hidden px-6 pb-6 ${className}`}
       {...props}
     >
       {isReceiptVisible ? (
@@ -413,7 +413,7 @@ function ReceiptPrinterOutput({
               : undefined,
           },
         }}
-        className="relative isolate before:pointer-events-none before:absolute before:inset-x-3 before:top-3 before:bottom-4 before:z-0 before:rounded-sm before:shadow-[0_8px_24px_rgba(0,0,0,0.24)] before:content-[''] after:pointer-events-none after:absolute after:right-[8%] after:bottom-0 after:left-[8%] after:z-0 after:h-3 after:translate-y-1.5 after:rounded-full after:bg-black/10 after:blur-lg after:content-['']"
+        className="relative isolate filter:[drop-shadow(0_16px_20px_rgba(0,0,0,0.12))_drop-shadow(0_4px_6px_rgba(0,0,0,0.06))] after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1 after:z-0 after:h-7 after:rounded-[100%] after:bg-black/15 after:blur-xl after:content-['']"
       >
         {children}
       </motion.div>
