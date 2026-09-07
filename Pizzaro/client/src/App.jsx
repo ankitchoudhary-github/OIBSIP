@@ -16,6 +16,9 @@ import Footer from "./components/layout/Footer";
 import Menu from "./pages/menu/Menu";
 import Checkout from "./pages/checkout/Checkout";
 
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminInventory from "./pages/admin/AdminInventory";
+
 function Home() {
   return (
     <>
@@ -73,14 +76,21 @@ function App() {
           element={<Checkout />}
         />
 
-         <Route
-        path="/order-confirmation/:orderId"
-        element={<OrderConfirmation />}
-      />
-
+        <Route
+          path="/order-confirmation/:orderId"
+          element={<OrderConfirmation />}
+        />
+        <Route
+          path="/admin/login"
+          element={<AdminLogin />}
+        />
+        <Route
+          path="/admin/inventory"
+          element={<AdminInventory />}
+        />
       </Routes>
 
-     
+
 
     </main>
   );
