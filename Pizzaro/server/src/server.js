@@ -5,7 +5,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { connectDB } from "./config/db.js";
-
+import inventoryRoutes from "./routes/inventoryRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -26,7 +27,8 @@ app.use(express.json());
 
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
-
+app.use("/api/admin", adminRoutes);
+app.use("/api/inventory", inventoryRoutes);
 /* =========================
    HEALTH CHECK
 ========================= */

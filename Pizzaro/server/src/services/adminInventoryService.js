@@ -114,7 +114,7 @@ export async function updateInventoryStock({
           },
         ],
         { session },
-      );
+      );    
 
       result = {
         item: option.toObject(),
