@@ -1,15 +1,27 @@
 import mongoose from "mongoose";
 
+const pizzaIngredientSchema =
+  new mongoose.Schema(
+    {
+      optionId: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      quantity: {
+        type: Number,
+        required: true,
+        min: 0.01,
+      },
+    },
+    {
+      _id: false,
+    },
+  );
+
 const pizzaSchema = new mongoose.Schema(
   {
-    /*
-      This is the product ID used by the frontend.
-
-      Example:
-      bbq-poncho
-      bombay
-      cheeseburger-pizza
-    */
     productId: {
       type: String,
       required: true,
@@ -29,12 +41,6 @@ const pizzaSchema = new mongoose.Schema(
       trim: true,
     },
 
-    /*
-      IMPORTANT:
-      This is the price the backend trusts.
-      Never use the price sent by the browser
-      when creating an order.
-    */
     price: {
       type: Number,
       required: true,
@@ -53,6 +59,15 @@ const pizzaSchema = new mongoose.Schema(
       enum: ["veg", "nonveg"],
     },
 
+    /*
+      Ingredients consumed when this
+      menu pizza is ordered.
+    */
+    recipe: {
+      type: [pizzaIngredientSchema],
+      default: [],
+    },
+
     featured: {
       type: Boolean,
       default: false,
@@ -68,6 +83,7 @@ const pizzaSchema = new mongoose.Schema(
   },
 );
 
-const Pizza = mongoose.model("Pizza", pizzaSchema);
+const Pizza =
+  mongoose.model("Pizza", pizzaSchema);
 
 export default Pizza;

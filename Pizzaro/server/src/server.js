@@ -1,14 +1,11 @@
 import paymentRoutes from "./routes/paymentRoutes.js";
-
 import orderRoutes from "./routes/orderRoutes.js";
-
 import "dotenv/config";
-
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-
 import { connectDB } from "./config/db.js";
+
 
 const app = express();
 

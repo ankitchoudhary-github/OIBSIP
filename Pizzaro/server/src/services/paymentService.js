@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
-
 import razorpay from "../config/razorpay.js";
 import Order from "../models/Order.js";
+import { deductInventoryForOrder } from "./inventoryService.js";
 
 export async function createRazorpayOrder({ amount, receipt }) {
   if (!Number.isInteger(amount) || amount <= 0) {
@@ -29,6 +29,28 @@ export async function verifyRazorpayPayment({
     throw new Error("MongoDB order ID is required.");
   }
 
+  const order = await Order.findById(mongoOrderId);
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  /*
+    If this order was already successfully verified,
+    don't process the Razorpay verification again.
+    Instead, safely reconcile inventory.
+  */
+  if (order.payment.status === "paid") {
+    const inventoryResult = await deductInventoryForOrder(order._id);
+    const updatedOrder = await Order.findById(order._id);
+
+    return {
+      order: updatedOrder,
+      alreadyPaid: true,
+      inventory: inventoryResult,
+    };
+  }
+
   if (!razorpayPaymentId) {
     throw new Error("Razorpay payment ID is required.");
   }
@@ -39,23 +61,6 @@ export async function verifyRazorpayPayment({
 
   if (!razorpaySignature) {
     throw new Error("Razorpay signature is required.");
-  }
-
-  const order = await Order.findById(mongoOrderId);
-
-  if (!order) {
-    throw new Error("Order not found.");
-  }
-
-  /*
-    If this order was already successfully verified,
-    don't process it again.
-  */
-  if (order.payment.status === "paid") {
-    return {
-      order,
-      alreadyPaid: true,
-    };
   }
 
   /*
@@ -105,29 +110,30 @@ export async function verifyRazorpayPayment({
     Signature is valid.
     Store the payment details for audit/idempotency.
   */
-  await Order.updateOne(
-    { _id: order._id },
-    {
-      $set: {
-        "payment.status": "paid",
-        "payment.provider": "razorpay",
-        "payment.razorpayOrderId": storedRazorpayOrderId,
-        "payment.paymentId": razorpayPaymentId,
-        status: "confirmed",
-      },
-
-      $unset: {
-        "payment.orderId": "",
-      },
+await Order.updateOne(
+  { _id: order._id },
+  {
+    $set: {
+      "payment.status": "paid",
+      "payment.provider": "razorpay",
+      "payment.razorpayOrderId": storedRazorpayOrderId,
+      "payment.paymentId": razorpayPaymentId,
+      status: "confirmed",
     },
-  );
+    $unset: { "payment.orderId": "" },
+  },
+);
 
-  const updatedOrder = await Order.findById(order._id);
+// Deduct inventory only after payment has been verified.
+const inventoryResult = await deductInventoryForOrder(order._id);
 
-  return {
-    order: updatedOrder,
-    alreadyPaid: false,
-  };
+const updatedOrder = await Order.findById(order._id);
+
+return {
+  order: updatedOrder,
+  alreadyPaid: false,
+  inventory: inventoryResult,
+};
 }
 
 export async function createPaymentForOrder(orderId) {

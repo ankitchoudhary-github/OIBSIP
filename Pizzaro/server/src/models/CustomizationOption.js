@@ -45,6 +45,30 @@ const customizationOptionSchema =
         default: "",
       },
 
+      /* =========================
+         INVENTORY
+      ========================== */
+
+      stock: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0,
+      },
+
+      threshold: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 20,
+      },
+
+      unit: {
+        type: String,
+        trim: true,
+        default: "units",
+      },
+
       active: {
         type: Boolean,
         default: true,

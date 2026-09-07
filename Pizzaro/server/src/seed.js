@@ -1,10 +1,3 @@
-import "dotenv/config";
-
-import mongoose from "mongoose";
-
-import { connectDB } from "./config/db.js";
-import Pizza from "./models/Pizza.js";
-
 const pizzas = [
   {
     productId: "bbq-poncho",
@@ -16,6 +9,14 @@ const pizzas = [
     category: "nonveg",
     featured: true,
     active: true,
+
+    recipe: [
+      { optionId: "classic", quantity: 1 },
+      { optionId: "bbq", quantity: 1 },
+      { optionId: "mozzarella", quantity: 1 },
+      { optionId: "onions", quantity: 1 },
+      { optionId: "capsicum", quantity: 1 },
+    ],
   },
 
   {
@@ -28,6 +29,15 @@ const pizzas = [
     category: "veg",
     featured: true,
     active: true,
+
+    recipe: [
+      { optionId: "whole-wheat", quantity: 1 },
+      { optionId: "spicy-arrabbiata", quantity: 1 },
+      { optionId: "cheddar", quantity: 1 },
+      { optionId: "onions", quantity: 1 },
+      { optionId: "capsicum", quantity: 1 },
+      { optionId: "sweet-corn", quantity: 1 },
+    ],
   },
 
   {
@@ -40,6 +50,15 @@ const pizzas = [
     category: "nonveg",
     featured: true,
     active: true,
+
+    recipe: [
+      { optionId: "classic", quantity: 1 },
+      { optionId: "creamy-garlic", quantity: 1 },
+      { optionId: "cheddar", quantity: 1 },
+      { optionId: "onions", quantity: 1 },
+      { optionId: "tomatoes", quantity: 1 },
+      { optionId: "jalapenos", quantity: 1 },
+    ],
   },
 
   {
@@ -52,6 +71,14 @@ const pizzas = [
     category: "nonveg",
     featured: false,
     active: true,
+
+    recipe: [
+      { optionId: "thin-crust", quantity: 1 },
+      { optionId: "pesto", quantity: 1 },
+      { optionId: "parmesan", quantity: 1 },
+      { optionId: "mushrooms", quantity: 1 },
+      { optionId: "black-olives", quantity: 1 },
+    ],
   },
 
   {
@@ -64,6 +91,14 @@ const pizzas = [
     category: "nonveg",
     featured: false,
     active: true,
+
+    recipe: [
+      { optionId: "classic", quantity: 1 },
+      { optionId: "classic-tomato", quantity: 1 },
+      { optionId: "mozzarella", quantity: 1 },
+      { optionId: "tomatoes", quantity: 1 },
+      { optionId: "spinach", quantity: 1 },
+    ],
   },
 
   {
@@ -76,6 +111,15 @@ const pizzas = [
     category: "veg",
     featured: false,
     active: true,
+
+    recipe: [
+      { optionId: "cheese-burst", quantity: 1 },
+      { optionId: "pesto", quantity: 1 },
+      { optionId: "four-cheese", quantity: 1 },
+      { optionId: "mushrooms", quantity: 1 },
+      { optionId: "black-olives", quantity: 1 },
+      { optionId: "spinach", quantity: 1 },
+    ],
   },
 
   {
@@ -88,6 +132,14 @@ const pizzas = [
     category: "nonveg",
     featured: false,
     active: true,
+
+    recipe: [
+      { optionId: "stuffed-crust", quantity: 1 },
+      { optionId: "bbq", quantity: 1 },
+      { optionId: "cheddar", quantity: 1 },
+      { optionId: "onions", quantity: 1 },
+      { optionId: "jalapenos", quantity: 1 },
+    ],
   },
 
   {
@@ -100,33 +152,14 @@ const pizzas = [
     category: "veg",
     featured: false,
     active: true,
+
+    recipe: [
+      { optionId: "whole-wheat", quantity: 1 },
+      { optionId: "creamy-garlic", quantity: 1 },
+      { optionId: "four-cheese", quantity: 1 },
+      { optionId: "capsicum", quantity: 1 },
+      { optionId: "onions", quantity: 1 },
+      { optionId: "tomatoes", quantity: 1 },
+    ],
   },
 ];
-
-async function seedPizzas() {
-  try {
-    await connectDB();
-
-    await Pizza.deleteMany({});
-
-    await Pizza.insertMany(pizzas);
-
-    console.log("Pizza catalog seeded successfully.");
-    console.log(`Inserted ${pizzas.length} pizzas.`);
-
-    await mongoose.connection.close();
-
-    process.exit(0);
-  } catch (error) {
-    console.error(
-      "Pizza seed failed:",
-      error.message,
-    );
-
-    await mongoose.connection.close();
-
-    process.exit(1);
-  }
-}
-
-seedPizzas();
