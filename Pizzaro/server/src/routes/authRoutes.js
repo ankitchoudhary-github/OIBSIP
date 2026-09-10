@@ -4,7 +4,10 @@ import {
   registerUserController,
   verifyEmailController,
   loginUserController,
+  getCurrentUserController,
 } from "../controllers/authController.js";
+
+import { requireUser } from "../middleware/userAuth.js";
 
 const router = express.Router();
 
@@ -16,5 +19,11 @@ router.get(
 );
 
 router.post("/login", loginUserController);
+
+router.get(
+  "/me",
+  requireUser,
+  getCurrentUserController,
+);
 
 export default router;
