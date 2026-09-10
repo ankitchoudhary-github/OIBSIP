@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
+import {
+  AUTH_CHANGED_EVENT,
+} from "../../components/layout/Navbar";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -52,7 +55,12 @@ export default function Login() {
         JSON.stringify(data.user),
       );
 
+      window.dispatchEvent(
+        new Event(AUTH_CHANGED_EVENT),
+      );
+
       navigate("/dashboard");
+      
     } catch (err) {
       setError(
         err.message || "Unable to sign in.",

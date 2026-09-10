@@ -213,7 +213,7 @@ export default function Dashboard() {
 
               <button
                 type="button"
-                onClick={() => navigate("/menu")}
+                onClick={() => navigate("/")}
                 className="mt-6 rounded-full bg-pizzaro-red px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 Browse Menu

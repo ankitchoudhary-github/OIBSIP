@@ -1,17 +1,28 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ShoppingBag, Menu } from "lucide-react";
+import {
+  ShoppingBag,
+  Menu,
+  ChevronDown,
+  User,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import Button from "../ui/Button";
 import CartDrawer from "../cart/CartDrawer";
 import { useCart } from "../../context/useCart";
-import { useNavigate } from "react-router-dom";
 
 export const CART_OPEN_EVENT = "pizzaro:open-cart";
+export const AUTH_CHANGED_EVENT = "pizzaro:auth-changed";
 
 function Navbar() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const { totalItems } = useCart();
   const navigate = useNavigate();
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const { totalItems } = useCart();
 
   useEffect(() => {
     const handleCartEvent = () => {
@@ -31,6 +42,53 @@ function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    function loadUser() {
+      const storedUser = localStorage.getItem(
+        "pizzaro_user",
+      );
+
+      if (!storedUser) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        setUser(null);
+      }
+    }
+
+    loadUser();
+
+    window.addEventListener(
+      AUTH_CHANGED_EVENT,
+      loadUser,
+    );
+
+    return () => {
+      window.removeEventListener(
+        AUTH_CHANGED_EVENT,
+        loadUser,
+      );
+    };
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem("pizzaro_user_token");
+    localStorage.removeItem("pizzaro_user");
+
+    setUser(null);
+    setIsAccountOpen(false);
+
+    window.dispatchEvent(
+      new Event(AUTH_CHANGED_EVENT),
+    );
+
+    navigate("/", { replace: true });
+  }
+
   return (
     <>
       <motion.header
@@ -43,33 +101,35 @@ function Navbar() {
         className="fixed left-0 right-0 top-0 z-50 px-6 py-5"
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-pizzaro-dark/5 bg-white/80 px-5 py-3 shadow-sm backdrop-blur-xl">
-
           {/* Logo */}
-          <a
-            href="/"
+          <button
+            type="button"
+            onClick={() => navigate("/")}
             className="font-display text-2xl font-bold tracking-tight text-pizzaro-dark"
           >
-            Pizzaro<span className="text-pizzaro-red">.</span>
-          </a>
+            Pizzaro
+            <span className="text-pizzaro-red">.</span>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 md:flex">
-            <a
-              href="#menu"
+            <button
+              type="button"
+              onClick={() => navigate("/menu")}
               className="text-sm font-medium text-pizzaro-muted transition-colors hover:text-pizzaro-red"
             >
               Menu
-            </a>
+            </button>
 
             <a
-              href="#customize"
+              href="/#customize"
               className="text-sm font-medium text-pizzaro-muted transition-colors hover:text-pizzaro-red"
             >
               Customize
             </a>
 
             <a
-              href="#how-it-works"
+              href="/#how-it-works"
               className="text-sm font-medium text-pizzaro-muted transition-colors hover:text-pizzaro-red"
             >
               How it works
@@ -78,7 +138,6 @@ function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-
             {/* Cart */}
             <motion.button
               type="button"
@@ -93,7 +152,6 @@ function Navbar() {
                 strokeWidth={2}
               />
 
-              {/* Cart count */}
               <AnimatePresence mode="popLayout">
                 <motion.span
                   key={totalItems}
@@ -121,14 +179,103 @@ function Navbar() {
               </AnimatePresence>
             </motion.button>
 
-            {/* Sign In */}
-            <Button
-              size="sm"
-              className="hidden sm:inline-flex"
-              onClick={() => navigate("/login")}
-            >
-              Sign In
-            </Button>
+            {/* Account */}
+            {user ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIsAccountOpen((current) => !current)
+                  }
+                  className="flex items-center gap-2 rounded-full border border-pizzaro-dark/10 bg-white px-3 py-2 transition hover:border-pizzaro-dark/20"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pizzaro-dark text-xs font-bold text-white">
+                    {user.name
+                      ?.charAt(0)
+                      .toUpperCase() || "U"}
+                  </div>
+
+                  <span className="hidden max-w-28 truncate text-sm font-semibold text-pizzaro-dark sm:block">
+                    {user.name}
+                  </span>
+
+                  <ChevronDown
+                    size={15}
+                    className={`text-pizzaro-muted transition-transform ${
+                      isAccountOpen
+                        ? "rotate-180"
+                        : ""
+                    }`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {isAccountOpen && (
+                    <motion.div
+                      initial={{
+                        opacity: 0,
+                        y: -5,
+                        scale: 0.98,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        y: -5,
+                        scale: 0.98,
+                      }}
+                      transition={{
+                        duration: 0.15,
+                      }}
+                      className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white p-2 shadow-xl"
+                    >
+                      <div className="px-3 py-3">
+                        <p className="text-sm font-semibold text-pizzaro-dark">
+                          {user.name}
+                        </p>
+
+                        <p className="mt-1 truncate text-xs text-pizzaro-muted">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <div className="my-1 h-px bg-black/5" />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAccountOpen(false);
+                          navigate("/dashboard");
+                        }}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-pizzaro-dark transition hover:bg-pizzaro-cream"
+                      >
+                        <User size={17} />
+                        My Dashboard
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-pizzaro-dark transition hover:bg-red-50 hover:text-pizzaro-red"
+                      >
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                className="hidden sm:inline-flex"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </Button>
+            )}
 
             {/* Mobile menu */}
             <button
@@ -142,7 +289,6 @@ function Navbar() {
         </nav>
       </motion.header>
 
-      {/* Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
