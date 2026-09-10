@@ -385,3 +385,14 @@ export async function getOrderById(orderId) {
 
   return order;
 }
+export async function getOrdersByUserId(userId) {
+  if (!userId) {
+    throw new Error("Authenticated user is required.");
+  }
+
+  return Order.find({
+    userId,
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+}
