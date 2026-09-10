@@ -22,8 +22,22 @@ const OrderConfirmation = () => {
 
     async function fetchOrder() {
       try {
+        const userToken = localStorage.getItem(
+          "pizzaro_user_token",
+        );
+
+        if (!userToken) {
+          navigate("/login");
+          return;
+        }
+
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/orders/${orderId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          },
         );
 
         const data = await response.json();

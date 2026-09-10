@@ -15,6 +15,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminInventory from "./pages/admin/AdminInventory";
 import AdminOrders from "./pages/admin/AdminOrders";
 import Login from "./pages/auth/Login";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 function Home() {
   return (
@@ -92,6 +93,10 @@ function App() {
         <Route
           path="/login"
           element={<Login />}
+        />
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
         />
 
       </Routes>

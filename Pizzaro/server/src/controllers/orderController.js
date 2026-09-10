@@ -8,7 +8,7 @@ export async function getOrderController(req, res) {
   try {
     const { orderId } = req.params;
 
-    const order = await getOrderById(orderId);
+    const order = await getOrderById(orderId, req.user._id);
 
     return res.status(200).json({
       success: true,
@@ -58,15 +58,11 @@ export async function getMyOrdersController(req, res) {
       orders,
     });
   } catch (error) {
-    console.error(
-      "Get my orders error:",
-      error.message,
-    );
+    console.error("Get my orders error:", error.message);
 
     return res.status(error.statusCode || 500).json({
       success: false,
-      message:
-        error.message || "Failed to get your orders.",
+      message: error.message || "Failed to get your orders.",
     });
   }
 }

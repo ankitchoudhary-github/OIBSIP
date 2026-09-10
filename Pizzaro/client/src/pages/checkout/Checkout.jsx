@@ -35,6 +35,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, subtotal, orderSuggestions, clearCart } = useCart();
 
+  const userToken = localStorage.getItem("pizzaro_user_token");
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -59,6 +61,11 @@ const Checkout = () => {
     event.preventDefault();
 
     if (isProcessingPayment) return;
+
+    if (!userToken) {
+      navigate("/login");
+      return;
+    }
 
     const { name, phone, address, city, state, pincode } = form;
 
@@ -96,7 +103,10 @@ const Checkout = () => {
         `${import.meta.env.VITE_API_URL}/api/orders`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
           body: JSON.stringify({
             items: cartItems.map((item) => {
               if (item.type === "custom") {

@@ -22,6 +22,7 @@ router.get(
 
 router.get(
   "/:orderId",
+  requireUser,
   getOrderController,
 );
 

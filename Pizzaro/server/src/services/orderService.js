@@ -362,25 +362,22 @@ export async function createOrder({ userId, items, customer }) {
   return order;
 }
 
-export async function getOrderById(orderId) {
-  if (!orderId) {
-    const error = new Error("Order ID is required.");
-    error.statusCode = 400;
-    throw error;
+export async function getOrderById(orderId, userId) {
+  if (!mongoose.isValidObjectId(orderId)) {
+    throw new Error("Invalid order ID.");
   }
 
-  if (!mongoose.Types.ObjectId.isValid(orderId)) {
-    const error = new Error("Invalid order ID.");
-    error.statusCode = 400;
-    throw error;
+  if (!userId) {
+    throw new Error("Authenticated user is required.");
   }
 
-  const order = await Order.findById(orderId).lean();
+  const order = await Order.findOne({
+    _id: orderId,
+    userId,
+  }).lean();
 
   if (!order) {
-    const error = new Error("Order not found.");
-    error.statusCode = 404;
-    throw error;
+    throw new Error("Order not found.");
   }
 
   return order;
