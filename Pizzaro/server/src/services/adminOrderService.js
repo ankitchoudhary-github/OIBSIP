@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
+import { getIO } from "../config/socket.js";
 
 const VALID_STATUSES = [
   "pending",
@@ -43,5 +44,19 @@ export async function updateOrderStatus(orderId, status) {
 
   await order.save();
 
-  return order.toObject();
+  const updatedOrder = order.toObject();
+
+  // Emit only after the database update succeeds.
+  const io = getIO();
+
+  io.to(`order:${orderId}`).emit(
+    "order-status-updated",
+    {
+      orderId: orderId.toString(),
+      status: updatedOrder.status,
+      updatedAt: updatedOrder.updatedAt,
+    },
+  );
+
+  return updatedOrder;
 }
