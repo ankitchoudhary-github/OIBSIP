@@ -14,6 +14,7 @@ import Checkout from "./pages/checkout/Checkout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminInventory from "./pages/admin/AdminInventory";
 import AdminOrders from "./pages/admin/AdminOrders";
+import Login from "./pages/auth/Login";
 
 function Home() {
   return (
@@ -87,6 +88,10 @@ function App() {
         <Route
           path="/admin/orders"
           element={<AdminOrders />}
+        />
+        <Route
+          path="/login"
+          element={<Login />}
         />
 
       </Routes>

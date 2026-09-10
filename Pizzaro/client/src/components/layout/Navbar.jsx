@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ShoppingBag, Menu } from "lucide-react";
-
 import Button from "../ui/Button";
 import CartDrawer from "../cart/CartDrawer";
 import { useCart } from "../../context/useCart";
+import { useNavigate } from "react-router-dom";
 
 export const CART_OPEN_EVENT = "pizzaro:open-cart";
 
 function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalItems } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleCartEvent = () => {
@@ -124,6 +125,7 @@ function Navbar() {
             <Button
               size="sm"
               className="hidden sm:inline-flex"
+              onClick={() => navigate("/login")}
             >
               Sign In
             </Button>

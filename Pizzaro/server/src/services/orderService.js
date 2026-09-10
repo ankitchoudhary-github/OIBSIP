@@ -6,10 +6,14 @@ import CustomizationOption from "../models/CustomizationOption.js";
 const MAX_QUANTITY_PER_ITEM = 20;
 const MAX_ITEMS_PER_ORDER = 50;
 
-export async function createOrder({ items, customer }) {
+export async function createOrder({ userId, items, customer }) {
   /* =========================
      BASIC ORDER VALIDATION
   ========================== */
+
+  if (!userId) {
+  throw new Error("Authenticated user is required.");
+}
 
   if (!Array.isArray(items) || items.length === 0) {
     throw new Error("Order must contain at least one item.");
@@ -340,6 +344,7 @@ export async function createOrder({ items, customer }) {
   ========================== */
 
   const order = await Order.create({
+    userId,
     items: orderItems,
 
     customer: {

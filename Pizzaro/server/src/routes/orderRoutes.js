@@ -5,10 +5,19 @@ import {
   getOrderController,
 } from "../controllers/orderController.js";
 
+import { requireUser } from "../middleware/userAuth.js";
+
 const router = express.Router();
 
-router.post("/", createOrderController);
+router.post(
+  "/",
+  requireUser,
+  createOrderController,
+);
 
-router.get("/:orderId", getOrderController);
+router.get(
+  "/:orderId",
+  getOrderController,
+);
 
 export default router;

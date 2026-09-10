@@ -30,6 +30,7 @@ export async function createOrderController(req, res) {
     const { items, customer } = req.body;
 
     const order = await createOrder({
+      userId: req.user._id,
       items,
       customer,
     });

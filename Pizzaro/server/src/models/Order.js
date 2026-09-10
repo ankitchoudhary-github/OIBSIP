@@ -87,6 +87,11 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     items: {
       type: [orderItemSchema],
       required: true,
@@ -166,7 +171,8 @@ const orderSchema = new mongoose.Schema(
         default: null,
       },
 
-      razorpayOrderId: {            //orderID to razorpayOrderId
+      razorpayOrderId: {
+        //orderID to razorpayOrderId
         type: String,
         default: null,
       },
