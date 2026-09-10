@@ -2,6 +2,7 @@ import {
   createOrder,
   getOrderById,
   getOrdersByUserId,
+  getTrackingOrder,
 } from "../services/orderService.js";
 
 export async function getOrderController(req, res) {
@@ -63,6 +64,33 @@ export async function getMyOrdersController(req, res) {
     return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "Failed to get your orders.",
+    });
+  }
+}
+
+export async function getTrackingOrderController(req, res) {
+  try {
+    const { orderId } = req.params;
+
+    const order = await getTrackingOrder(
+      orderId,
+      req.user._id,
+    );
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error(
+      "Get tracking order error:",
+      error.message,
+    );
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message:
+        error.message || "Failed to get tracking order.",
     });
   }
 }

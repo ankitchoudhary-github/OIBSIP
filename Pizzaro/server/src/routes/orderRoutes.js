@@ -3,6 +3,7 @@ import {
   createOrderController,
   getOrderController,
   getMyOrdersController,
+  getTrackingOrderController,
 } from "../controllers/orderController.js";
 import { requireUser } from "../middleware/userAuth.js";
 
@@ -18,6 +19,12 @@ router.get(
   "/my-orders",
   requireUser,
   getMyOrdersController,
+);
+
+router.get(
+  "/:orderId/tracking",
+  requireUser,
+  getTrackingOrderController,
 );
 
 router.get(

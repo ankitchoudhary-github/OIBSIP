@@ -393,3 +393,28 @@ export async function getOrdersByUserId(userId) {
     .sort({ createdAt: -1 })
     .lean();
 }
+
+export async function getTrackingOrder(orderId, userId) {
+  if (!mongoose.isValidObjectId(orderId)) {
+    throw new Error("Invalid order ID.");
+  }
+
+  if (!userId) {
+    throw new Error("Authenticated user is required.");
+  }
+
+  const order = await Order.findOne({
+    _id: orderId,
+    userId,
+  })
+    .select(
+      "_id status subtotal createdAt updatedAt payment.status items.name items.quantity items.lineTotal customer.city customer.state",
+    )
+    .lean();
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  return order;
+}
