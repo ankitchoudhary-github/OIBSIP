@@ -375,7 +375,7 @@ export default function AdminOrders() {
                               event.target.value,
                             )
                           }
-                          className="min-w-[170px] rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 outline-none transition focus:border-neutral-900 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="min-w-42.5 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 outline-none transition focus:border-neutral-900 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {statuses.map((status) => (
                             <option

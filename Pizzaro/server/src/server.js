@@ -8,6 +8,7 @@ import { connectDB } from "./config/db.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/auth", authRoutes);
 /* =========================
    HEALTH CHECK
 ========================= */
