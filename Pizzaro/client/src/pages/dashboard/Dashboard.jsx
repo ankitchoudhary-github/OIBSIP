@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { createUserSocket } from "../../config/socket";
 import {
     ArrowRight,
     CheckCircle,
@@ -70,6 +71,7 @@ const statusRank = {
     delivered: 4,
 };
 
+
 export default function Dashboard() {
     const navigate = useNavigate();
 
@@ -77,6 +79,7 @@ export default function Dashboard() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [liveStatus, setLiveStatus] = useState(null);
 
     const userToken = localStorage.getItem(
         "pizzaro_user_token",
@@ -179,6 +182,69 @@ export default function Dashboard() {
                 ),
         );
     }, [orders]);
+    useEffect(() => {
+        setLiveStatus(null);
+        
+        if (!activeOrder?._id) {
+            return;
+        }
+
+        const socket = createUserSocket();
+
+        if (!socket) {
+            return;
+        }
+
+        socket.on("connect", () => {
+            console.log(
+                "Customer Socket.IO connected:",
+                socket.id,
+            );
+
+            socket.emit(
+                "join-order",
+                activeOrder._id,
+            );
+        });
+
+        socket.on("order-status-updated", (data) => {
+            if (data.orderId !== activeOrder._id) {
+                return;
+            }
+
+            setLiveStatus(data.status);
+
+            setOrders((currentOrders) =>
+                currentOrders.map((order) =>
+                    order._id === data.orderId
+                        ? {
+                            ...order,
+                            status: data.status,
+                            updatedAt: data.updatedAt,
+                        }
+                        : order,
+                ),
+            );
+        });
+
+        socket.on("order-access-denied", () => {
+            console.error(
+                "Socket order access denied.",
+            );
+        });
+
+        socket.on("connect_error", (error) => {
+            console.error(
+                "Socket connection error:",
+                error.message,
+            );
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [activeOrder?._id]);
+
 
     const completedOrders = useMemo(() => {
         return orders.filter(
@@ -200,6 +266,9 @@ export default function Dashboard() {
             </main>
         );
     }
+
+    const displayedActiveStatus =
+        liveStatus || activeOrder?.status;
 
     return (
         <main className="min-h-screen bg-pizzaro-cream px-6 pb-24 pt-32">
@@ -269,21 +338,20 @@ export default function Dashboard() {
                                 </div>
 
                                 <span
-                                    className={`w-fit rounded-full px-4 py-2 text-xs font-semibold ${activeOrder.status ===
+                                    className={`w-fit rounded-full px-4 py-2 text-xs font-semibold ${displayedActiveStatus ===
                                         "out_for_delivery"
                                         ? "bg-white text-pizzaro-dark"
                                         : "bg-white/10 text-white"
                                         }`}
                                 >
-                                    {statusLabels[
-                                        activeOrder.status
+                                    {statusLabels[displayedActiveStatus
                                     ] || activeOrder.status}
                                 </span>
                             </div>
 
                             <div className="mt-10">
                                 <TrackingProgress
-                                    currentStatus={activeOrder.status}
+                                    currentStatus={displayedActiveStatus}
                                 />
                             </div>
 

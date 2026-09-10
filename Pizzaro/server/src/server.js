@@ -1,3 +1,5 @@
+import { createServer } from "node:http";
+import { initializeSocket } from "./config/socket.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import "dotenv/config";
@@ -11,6 +13,8 @@ import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
+const httpServer = createServer(app);
+const io = initializeSocket(httpServer);
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,10 +54,8 @@ app.get("/api/health", (req, res) => {
 async function startServer() {
   await connectDB();
 
-  app.listen(PORT, () => {
-    console.log(
-      `Pizzaro API running on http://localhost:${PORT}`,
-    );
+  httpServer.listen(PORT, () => {
+    console.log(`Pizzaro API running on http://localhost:${PORT}`);
   });
 }
 
