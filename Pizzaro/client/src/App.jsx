@@ -1,23 +1,19 @@
 import OrderConfirmation from "./pages/orderConfirmation/OrderConfirmation.jsx";
-
 import HowItWorks from "./components/landing/HowItWorks";
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import CartToast from "./components/ui/CartToast";
 import { useCart } from "./context/useCart";
-
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/landing/Hero";
 import FeaturedPizzas from "./components/landing/FeaturedPizzas";
 import PizzaCustomizer from "./components/customize/PizzaCustomizer";
 import Footer from "./components/layout/Footer";
-
 import Menu from "./pages/menu/Menu";
 import Checkout from "./pages/checkout/Checkout";
-
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminInventory from "./pages/admin/AdminInventory";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function Home() {
   return (
@@ -88,9 +84,12 @@ function App() {
           path="/admin/inventory"
           element={<AdminInventory />}
         />
+        <Route
+          path="/admin/orders"
+          element={<AdminOrders />}
+        />
+
       </Routes>
-
-
 
     </main>
   );

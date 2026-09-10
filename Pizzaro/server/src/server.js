@@ -7,6 +7,7 @@ import helmet from "helmet";
 import { connectDB } from "./config/db.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use(
 
 app.use(helmet());
 app.use(express.json());
-
+app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
