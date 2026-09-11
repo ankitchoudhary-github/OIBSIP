@@ -16,6 +16,8 @@ import AdminInventory from "./pages/admin/AdminInventory";
 import AdminOrders from "./pages/admin/AdminOrders";
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 function Home() {
   return (
@@ -98,6 +100,8 @@ function App() {
           path="/dashboard"
           element={<Dashboard />}
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       </Routes>
 
